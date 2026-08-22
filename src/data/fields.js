@@ -1,0 +1,40 @@
+export const fields = [
+  {
+    id: 1,
+    name: "Field Alpha",
+    type: "Olive Grove",
+    area: "12.5 ha",
+    sensors: 5,
+    moisture: 42,
+    temperature: 28,
+    humidity: 61,
+    rain: 0.4,
+    status: "Healthy",
+  },
+
+  {
+    id: 2,
+    name: "Vaitsa",
+    type: "Olive Grove",
+    area: "8.2 ha",
+    sensors: 4,
+    moisture: 27,
+    temperature: 31,
+    humidity: 54,
+    rain: 0,
+    status: "Attention",
+  },
+
+  {
+    id: 3,
+    name: "Field Beta",
+    type: "Vegetables",
+    area: "15.7 ha",
+    sensors: 3,
+    moisture: 18,
+    temperature: 33,
+    humidity: 48,
+    rain: 0,
+    status: "Alert",
+  },
+];
