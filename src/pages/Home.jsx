@@ -4,23 +4,23 @@ import FieldCard from "../components/FieldCard";
 export default function Home({ fields, onSelectField }) {
   return (
 
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main className="min-h-screen bg-emerald-50">
 
       {/* HERO */}
 
-      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+      <section className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-10">
 
         <div>
 
-          <p className="text-xs font-bold tracking-widest text-emerald-600 uppercase">
-            OVERVIEW
+          <p className="text-xs font-semibold tracking-[0.2em] text-emerald-700 uppercase">
+            FIELD OVERVIEW
           </p>
 
-          <h1 className="text-3xl font-black text-gray-900 mt-1 tracking-tight">
+          <h1 className="text-4xl font-red text-gray-900 mt-2 tracking-tight">
             My Fields
           </h1>
 
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-lg text-green-800 mt-3 max-w-xl leading-relaxed font-light italic tracking-wide">
             Monitor the health and conditions of your agricultural fields.
           </p>
 
