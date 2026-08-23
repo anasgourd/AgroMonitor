@@ -8,17 +8,14 @@ export default function Home({ fields, onSelectField }) {
 
       {/* HERO */}
 
-      <section className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-10">
+      <section className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-5">
 
         <div>
 
-          <p className="text-xs font-semibold tracking-[0.2em] text-emerald-700 uppercase">
+          <p className="text-8xs font-semibold tracking-[0.2em] text-amber-900 uppercase">
             FIELD OVERVIEW
           </p>
 
-          <h1 className="text-4xl font-red text-amber-900 mt-2 tracking-tight">
-            My Fields
-          </h1>
 
           <p className="text-lg text-emerald-700 mt-3 max-w-xl leading-relaxed font-light italic tracking-wide">
             Monitor the health and conditions of your agricultural fields.
@@ -79,13 +76,10 @@ export default function Home({ fields, onSelectField }) {
 
           <div>
 
-            <p className="text-xs font-bold tracking-widest text-emerald-600 uppercase">
-              YOUR FARMS
+            <p className="text-xl font-red text-amber-900 mt-2 tracking-tight uppercase">
+              MY FIELDS
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900">
-              Your fields
-            </h2>
 
           </div>
 
