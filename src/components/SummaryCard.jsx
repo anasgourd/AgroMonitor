@@ -9,8 +9,8 @@ export default function SummaryCard({
       className="
         group relative overflow-hidden
         rounded-2xl
-        border border-white/10
-        bg-white/[0.04]
+        border border-emerald-300
+        bg-emerald-800
         backdrop-blur-xl
         p-5
         flex items-center gap-4
@@ -58,7 +58,7 @@ export default function SummaryCard({
           {value}
         </strong>
 
-        <span className="text-[10px] text-gray-400 font-semibold mt-2 uppercase tracking-[0.18em]">
+        <span className="text-[10px] text-emerald-100/70  font-semibold mt-2 uppercase tracking-[0.18em]">
           {label}
         </span>
 
