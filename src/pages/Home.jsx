@@ -16,11 +16,11 @@ export default function Home({ fields, onSelectField }) {
             FIELD OVERVIEW
           </p>
 
-          <h1 className="text-4xl font-red text-gray-900 mt-2 tracking-tight">
+          <h1 className="text-4xl font-red text-amber-900 mt-2 tracking-tight">
             My Fields
           </h1>
 
-          <p className="text-lg text-green-800 mt-3 max-w-xl leading-relaxed font-light italic tracking-wide">
+          <p className="text-lg text-emerald-700 mt-3 max-w-xl leading-relaxed font-light italic tracking-wide">
             Monitor the health and conditions of your agricultural fields.
           </p>
 
