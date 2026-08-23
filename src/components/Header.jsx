@@ -1,18 +1,21 @@
+import { Sprout } from "lucide-react";
+
 export default function Header() {
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shadow-sm">
+    <header className="bg-slate-50 border-b border-gray-200 px-6 py-4 flex items-center justify-between shadow-sm">
 
       {/* Logo */}
       <div className="flex items-center gap-3">
 
-        <div className="text-3xl bg-emerald-50 p-2 rounded-xl">
-          🌱
+        <div className="flex items-center justify-center w-11 h-11 rounded-xl bg-emerald-100 text-emerald-700">
+          <Sprout size={22} strokeWidth={1.8} />
         </div>
 
         <div className="flex flex-col">
 
-          <strong className="text-lg font-bold text-gray-800 leading-none">
-            AgroMonitor
+          <strong className="text-2xl font-black leading-none tracking-tight">
+            <span className="text-amber-900">AGRO</span>
+            <span className="text-emerald-700">MONITOR</span>
           </strong>
 
           <span className="text-xs text-emerald-600 font-medium mt-1">
