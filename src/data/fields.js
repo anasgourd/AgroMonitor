@@ -1,8 +1,8 @@
 export const fields = [
   {
     id: 1,
-    name: "Field Alpha",
-    type: "Olive Grove",
+    name: "Μπέης",
+    type: "Oranges",
     area: "12.5 ha",
     sensors: 5,
     moisture: 42,
@@ -14,7 +14,7 @@ export const fields = [
 
   {
     id: 2,
-    name: "Vaitsa",
+    name: "Βαίτσα",
     type: "Olive Grove",
     area: "8.2 ha",
     sensors: 4,
@@ -27,8 +27,8 @@ export const fields = [
 
   {
     id: 3,
-    name: "Field Beta",
-    type: "Vegetables",
+    name: "Ευανθία",
+    type: "Oranges",
     area: "15.7 ha",
     sensors: 3,
     moisture: 18,

@@ -13,14 +13,14 @@ export default function FieldCard({ field, onSelect }) {
   };
 
   const fieldImages = {
-    "Field Alpha": "from-emerald-400 to-teal-500",
-    Vaitsa: "from-amber-400 to-orange-500",
-    "Field Beta": "from-rose-400 to-pink-500",
+    "Μπέης": "from-emerald-400 to-teal-500",
+    "Βαίτσα": "from-amber-400 to-orange-500",
+    "Ευανθία": "from-rose-400 to-pink-500",
   };
 
   return (
 
-    <article className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col">
+    <article className="bg-amber-50 rounded-2xl border border-[#dfd1c1] shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col">
 
       {/* FIELD IMAGE */}
 
@@ -88,7 +88,7 @@ export default function FieldCard({ field, onSelect }) {
 
         <div className="grid grid-cols-2 gap-4 my-4">
 
-          <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-100">
+          <div className="bg-emerald-200 p-2.5 rounded-xl border border-gray-100">
 
             <span className="block text-[11px] text-gray-500 font-medium">
               Soil Moisture
@@ -101,7 +101,7 @@ export default function FieldCard({ field, onSelect }) {
           </div>
 
 
-          <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-100">
+          <div className="bg-emerald-200 p-2.5 rounded-xl border border-gray-100">
 
             <span className="block text-[11px] text-gray-500 font-medium">
               Temperature
@@ -120,7 +120,7 @@ export default function FieldCard({ field, onSelect }) {
 
         <button
           onClick={() => onSelect(field)}
-          className="mt-auto block w-full text-center bg-gray-50 hover:bg-gray-100 text-gray-700 font-semibold text-sm py-2.5 rounded-xl border border-gray-200 transition-colors"
+          className="mt-auto block w-full text-center bg-emerald-200 hover:bg-gray-100 text-gray-700 font-semibold text-sm py-2.5 rounded-xl border border-gray-200 transition-colors"
         >
           View Field →
         </button>
