@@ -1,99 +1,106 @@
-export default function FieldDashboard({
-  field,
-  onBack,
-}) {
-  return (
 
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+import {
+  createFallbackSensors,
+  createFallbackHistory,
+  calculateAverage,
+  statusStyles,
+} from "../utils/fieldUtils";
 
-      <button
-        onClick={onBack}
-        className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 mb-8"
-      >
-        ← Back to My Fields
-      </button>
-
-
-      <div className="mb-8">
-
-        <p className="text-xs font-bold tracking-widest text-emerald-600 uppercase">
-          FIELD DASHBOARD
-        </p>
-
-        <h1 className="text-4xl font-black text-gray-900 mt-1">
-          {field.name}
-        </h1>
-
-        <p className="text-gray-500 mt-2">
-          {field.type} · {field.area}
-        </p>
-
-      </div>
+import LineChart from "../components/FieldDashboard/LineChart";
+import SensorSummary from "../components/FieldDashboard/SensorSummary";
+import SensorInventory from "../components/FieldDashboard/SensorInventory";
+import HistoricalAnalysis from "../components/FieldDashboard/HistoricalAnalysis";
+import FieldMap from "../components/FieldDashboard/FieldMap";
+import FieldOverview from "../components/FieldDashboard/FieldOverview";
+import FieldHeader from "../components/FieldDashboard/FieldHeader";
 
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-
-        <Metric
-          label="Soil Moisture"
-          value={`${field.moisture}%`}
-        />
-
-        <Metric
-          label="Temperature"
-          value={`${field.temperature}°C`}
-        />
-
-        <Metric
-          label="Humidity"
-          value={`${field.humidity}%`}
-        />
-
-        <Metric
-          label="Rainfall"
-          value={`${field.rain} mm`}
-        />
-
-      </div>
-
-
-      <div className="mt-8 bg-white rounded-2xl border border-gray-100 shadow-sm p-8 h-80 flex items-center justify-center">
-
+// Handle the case where the requested field does not exist.
+// Display a fallback view when no field data is available.
+export default function FieldDashboard({ field, onBack }) {
+  if (!field) {
+    return (
+      <main className="min-h-screen bg-emerald-50 flex items-center justify-center">
         <div className="text-center">
-
-          <div className="text-5xl mb-4">
-            🗺️
-          </div>
-
-          <h2 className="text-xl font-bold">
-            Field Map
+          <h2 className="text-2xl font-black text-amber-900">
+            Field not found
           </h2>
 
-          <p className="text-sm text-gray-500 mt-2">
-            Interactive field map will go here.
-          </p>
-
+          <button
+            onClick={onBack}
+            className="mt-4 px-4 py-2 rounded-xl bg-emerald-700 text-white font-semibold"
+          >
+            Back
+          </button>
         </div>
+      </main>
+    );
+  }
+  // Prepare sensor data, historical data, averages, and field status for the dashboard.
+  const sensors = field.sensorDetails ?? createFallbackSensors(field);
+
+  const temperatureSensors = sensors.filter(
+    (sensor) => sensor.type === "Temperature"
+  );
+
+  const humiditySensors = sensors.filter(
+    (sensor) => sensor.type === "Humidity"
+  );
+
+  const history = field.history ?? createFallbackHistory(field);
+
+  const averageTemperature = calculateAverage(temperatureSensors);
+  const averageHumidity = calculateAverage(humiditySensors);
+
+  const currentStatus =
+    statusStyles[field.status] || statusStyles.Healthy;
+  // Render the field dashboard with the prepared data.
+  return (
+    <main className="min-h-screen bg-emerald-50 px-4 sm:px-6 lg:px-8 py-6">
+      <div className="max-w-7xl mx-auto">
+
+        {/* HEADER */}
+
+        <FieldHeader
+          name={field.name}
+          status={field.status}
+          statusStyle={currentStatus}
+          onBack={onBack}
+        />
+
+        {/* LIVE SENSOR SUMMARY */}
+
+        <SensorSummary
+          averageHumidity={averageHumidity}
+          averageTemperature={averageTemperature}
+          sensorCount={sensors.length}
+        />
+
+        {/* SENSOR INVENTORY */}
+
+        <SensorInventory
+          temperatureSensors={temperatureSensors}
+          humiditySensors={humiditySensors}
+        />
+
+        {/* HISTORICAL ANALYSIS */}
+        <HistoricalAnalysis history={history} />
+
+        {/* MAP + FIELD OVERVIEW */}
+
+        <section className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-8">
+
+          <FieldMap area={field.area} />
+
+          <FieldOverview
+            name={field.name}
+            type={field.type}
+            status={field.status}
+          />
+
+        </section>
 
       </div>
-
     </main>
-  );
-}
-
-
-function Metric({ label, value }) {
-  return (
-
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-
-      <span className="text-xs text-gray-500">
-        {label}
-      </span>
-
-      <strong className="block text-2xl font-black text-gray-900 mt-2">
-        {value}
-      </strong>
-
-    </div>
   );
 }

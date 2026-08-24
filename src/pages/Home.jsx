@@ -8,12 +8,12 @@ export default function Home({ fields, onSelectField }) {
 
       {/* HERO */}
 
-      <section className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-5">
+      <section className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-8 mb-12">
 
         <div>
 
           <p className="text-8xs font-semibold tracking-[0.2em] text-amber-900 uppercase">
-            FIELD OVERVIEW
+            FIELDS OVERVIEW
           </p>
 
 
