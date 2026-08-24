@@ -4,6 +4,7 @@ export default function FieldOverview({
     name,
     type,
     status,
+    message,
 }) {
     return (
         <div className="lg:col-span-2 bg-[#bfa58c] rounded-3xl border border-[#aa8d70] shadow-sm p-6 flex flex-col">
@@ -77,13 +78,9 @@ export default function FieldOverview({
 
                     <div className="mt-4 flex items-center justify-between text-xs">
 
-                        <span className="text-gray-800/60 font-semibold">
-                            Model confidence
-                        </span>
-
-                        <span className="font-black text-gray-900">
-                            94%
-                        </span>
+                        <p className="text-sm text-gray-800/80">
+                            {message}
+                        </p>
 
                     </div>
 

@@ -1,12 +1,9 @@
-
 import {
-  createFallbackSensors,
-  createFallbackHistory,
+
   calculateAverage,
   statusStyles,
 } from "../utils/fieldUtils";
 
-import LineChart from "../components/FieldDashboard/LineChart";
 import SensorSummary from "../components/FieldDashboard/SensorSummary";
 import SensorInventory from "../components/FieldDashboard/SensorInventory";
 import HistoricalAnalysis from "../components/FieldDashboard/HistoricalAnalysis";
@@ -37,7 +34,7 @@ export default function FieldDashboard({ field, onBack }) {
     );
   }
   // Prepare sensor data, historical data, averages, and field status for the dashboard.
-  const sensors = field.sensorDetails ?? createFallbackSensors(field);
+  const sensors = field.sensorDetails
 
   const temperatureSensors = sensors.filter(
     (sensor) => sensor.type === "Temperature"
@@ -47,13 +44,15 @@ export default function FieldDashboard({ field, onBack }) {
     (sensor) => sensor.type === "Humidity"
   );
 
-  const history = field.history ?? createFallbackHistory(field);
+  const history = field.history
 
   const averageTemperature = calculateAverage(temperatureSensors);
   const averageHumidity = calculateAverage(humiditySensors);
 
   const currentStatus =
     statusStyles[field.status] || statusStyles.Healthy;
+
+
   // Render the field dashboard with the prepared data.
   return (
     <main className="min-h-screen bg-emerald-50 px-4 sm:px-6 lg:px-8 py-6">
@@ -96,6 +95,7 @@ export default function FieldDashboard({ field, onBack }) {
             name={field.name}
             type={field.type}
             status={field.status}
+            message={currentStatus.message}
           />
 
         </section>

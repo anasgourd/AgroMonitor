@@ -46,7 +46,7 @@ export default function Home({ fields, onSelectField }) {
           icon="📡"
           iconBackground="bg-blue-50"
           value={fields.reduce(
-            (total, field) => total + field.sensors,
+            (total, field) => total + field.sensorDetails.length,
             0
           )}
           label="Active Sensors"
