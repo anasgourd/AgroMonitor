@@ -1,12 +1,32 @@
-# React + Vite
+# AgroMonitor
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+AgroMonitor is a React web application for monitoring agricultural fields, viewing sensor-based metrics, and reviewing field-level status at a glance.
 
-Currently, two official plugins are available:
+## Development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```bash
+npm install
+npm run dev
+```
 
-## Expanding the ESLint configuration
+## Non-Functional Requirements (NFRs)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. **Performance**
+   - The dashboard should render the initial view in under 2 seconds on a standard broadband connection and a modern desktop browser.
+   - Navigation between the field list and field dashboard should complete in under 500 ms.
+
+2. **Availability & Reliability**
+   - The deployed application should target 99.5% monthly uptime.
+   - Failures in loading field data should present a user-facing fallback state rather than a blank screen.
+
+3. **Usability**
+   - Core workflows (viewing fields and opening a field dashboard) should be usable on mobile, tablet, and desktop screen sizes.
+   - Text and controls should maintain accessible contrast and readable sizing for default browser zoom.
+
+4. **Maintainability**
+   - All pull requests must pass lint checks (`npm run lint`) before merge.
+   - UI behavior should remain componentized and reusable (e.g., shared cards and page components) to reduce duplication.
+
+5. **Security & Privacy**
+   - No secrets (API keys, tokens, credentials) may be committed to the repository.
+   - Any future backend/API integration must use HTTPS for data in transit.
