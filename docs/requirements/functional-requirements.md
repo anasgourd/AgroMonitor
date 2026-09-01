@@ -30,8 +30,8 @@ The user shall be able to modify the information of an existing sensor.
 FR-10 — Remove Sensor
 The user shall be able to remove a sensor from a field.
 
-FR-11 — Retrieve Measurements
-The user shall be able to retrieve measurements for a selected sensor.
+FR-11 — View Measurements
+The user shall be able to view measurements for a selected sensor.
 
 FR-12 — Record Measurements
 The system shall record measurements produced by registered sensors.
