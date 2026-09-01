@@ -1,20 +1,20 @@
 NFR-01 — API Response Time
-The system shall respond to standard API requests within 500 ms under normal operating conditions.
+The system shall respond to standard API requests within 500 ms for at least 95% of requests (p95) under a normal operating load of up to 20 concurrent users (or 10 requests per second).
 
 NFR-02 — Dashboard Load Time
-The web application shall load the main field dashboard within 2 seconds under normal operating conditions.
+The web application shall fully render the main field dashboard and become interactive within 2 seconds for at least 95% of user sessions (p95) under a normal operating load of up to 20 concurrent users.
 
 NFR-03 — Horizontal Scalability
-The backend architecture shall support horizontal scaling as the number of users, fields, sensors, and measurements increases.
+The backend architecture shall support horizontal scaling so that increasing active users or measurement volume by at least 3x does not degrade performance beyond the baselines defined in NFR-01 and NFR-02.
 
-NFR-05 — Fault Isolation
-Failure or loss of communication with an individual sensor shall not prevent the system from receiving and processing data from other available sensors.
+NFR-04 — Fault Isolation
+The system shall isolate sensor connection failures, timeouts, and malformed telemetry payloads at the individual sensor stream level, ensuring that a failure affecting one sensor does not impede data ingestion or storage for any other active sensor.
 
-NFR-09 — System Observability
-The system shall expose logs and metrics for application errors, data ingestion failures, processing failures, and ML pipeline failures, enabling the identification of the affected component and the time of failure.
+NFR-05 — System Observability
+The system shall provide sufficient observability to enable the detection and identification of application, data ingestion, processing, and ML pipeline failures within 15 minutes of occurrence.
 
-NFR-10 — Authentication and Authorization
+NFR-06 — Authentication and Authorization
 The system shall ensure that users can access only the fields, sensors, and data for which they are authorized.
 
-NFR-15 — Platform Compatibility
-The web application shall support the latest two stable versions of Google Chrome, Mozilla Firefox, Microsoft Edge, and Safari on Windows, macOS, and Linux.
+NFR-07 — Platform Compatibility
+The web application shall support the latest two stable versions of Google Chrome, Mozilla Firefox, Microsoft Edge, and Safari.
