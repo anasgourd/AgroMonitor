@@ -60,12 +60,15 @@ FR-03, FR-04, FR-05
 
 ## UC-04 — View Sensors
 
+### Preconditions
+
+1. The Farmer has selected a field.
+
 ### Main Success Scenario
 
-1. The Farmer selects a field.
-2. The Farmer accesses the sensors associated with the selected field.
-3. The system retrieves the sensors associated with the selected field.
-4. The system displays the available sensors.
+1. The Farmer accesses the sensors associated with the selected field.
+2. The system retrieves the sensors associated with the selected field.
+3. The system displays the available sensors.
 
 ### Alternative / Exception Flows
 
@@ -80,12 +83,15 @@ FR-06
 
 ## UC-05 — View Sensor Information
 
+### Preconditions
+
+1. The Farmer has selected a field.
+
 ### Main Success Scenario
 
-1. The Farmer selects a field.
-2. The Farmer selects a sensor associated with the field.
-3. The system retrieves the sensor information.
-4. The system displays the sensor information.
+1. The Farmer selects a sensor associated with the selected field.
+2. The system retrieves the sensor information.
+3. The system displays the sensor information.
 
 ### Alternative / Exception Flows
 
@@ -99,18 +105,23 @@ FR-07
 
 ## UC-06 — Manage Sensors
 
+### Preconditions
+
+1. The Farmer has selected a field.
+
 ### Main Success Scenario
 
-1. The Farmer selects a field.
-2. The Farmer accesses the sensor management functionality.
-3. The Farmer selects the desired operation: add, edit, or remove a sensor.
-4. The system performs the selected operation.
-5. The system confirms the successful completion of the operation.
+1. The Farmer accesses the sensor management functionality.
+2. The Farmer selects the desired operation: add, edit, or remove a sensor.
+3. The system performs the selected operation.
+4. The system confirms the successful completion of the operation.
 
 ### Alternative / Exception Flows
 
 - If the provided sensor information is invalid or incomplete, the system informs the Farmer and requests correction.
+
 - If the selected sensor cannot be found or accessed, the system informs the Farmer that the sensor is unavailable.
+
 - If the operation cannot be completed, the system informs the Farmer that the operation was unsuccessful.
 
 ### Traceability
@@ -121,16 +132,20 @@ FR-08, FR-09, FR-10
 
 ## UC-07 — View Measurements
 
+### Preconditions
+
+1. The Farmer has selected a sensor.
+
 ### Main Success Scenario
 
-1. The Farmer selects a sensor.
-2. The Farmer accesses the sensor's measurements.
-3. The system retrieves the measurements associated with the selected sensor.
-4. The system displays the available measurements.
+1. The Farmer accesses the measurements associated with the selected sensor.
+2. The system retrieves the measurements associated with the selected sensor.
+3. The system displays the available measurements.
 
 ### Alternative / Exception Flows
 
 - If no measurements are available for the selected sensor, the system informs the Farmer that no measurements are available.
+
 - If the selected sensor cannot be found or accessed, the system informs the Farmer that the sensor is unavailable.
 
 ### Traceability
