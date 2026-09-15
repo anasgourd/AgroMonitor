@@ -12,83 +12,43 @@ The analysis focuses on understanding the system's functionality, main domain co
 
 AgroMonitor uses an **Object-Oriented Analysis (OOAD)** approach.
 
-The main domain concepts identified are:
+The system contains identifiable domain concepts such as **Fields, Sensors, Measurements, and Alerts**, which have their own responsibilities, relationships, and interactions.
 
-- User
-- Field
-- Sensor
-- Measurement
-- Alert
+This makes an object-oriented approach suitable for modelling both the **static structure** and the **dynamic behavior** of the system.
 
----
+## 3. Coverage of Use Cases
 
-## 3. Use Case Analysis
+The analysis models are derived from and support the defined **use cases**.
 
-Use Cases were used to describe the main system functionality and the interaction between the Farmer and the system.
+The sequence diagrams describe how the identified actors, boundary objects, controllers, and domain objects collaborate to realize the corresponding use cases.
 
-The main use cases are:
+The static models provide the structural view, while the sequence diagrams provide the behavioral view.
 
-- UC-01 — View Fields
-- UC-02 — View Field Information
-- UC-03 — Manage Field
-- UC-04 — View Sensors
-- UC-05 — View Sensor Information
-- UC-06 — Manage Sensors
-- UC-07 — View Measurements
-- UC-08 — View Alerts
-- UC-09 — Record Measurements
-- UC-10 — Generate Alerts
 
-Detailed specifications are documented in:
+## 4. Analysis Without Implementation Details
 
-`docs/use_cases/use_case_specifications.md`
+The analysis models are intentionally kept at an **abstract level** and avoid implementation-specific decisions.
 
----
+The BCE/domain models and sequence diagrams describe:
 
-## 4. Static Analysis
+- the relevant system objects and concepts,
+- their responsibilities,
+- their relationships,
+- and their interactions.
 
-A **BCE (Boundary-Control-Entity)** model was used to identify the main objects and their responsibilities.
+Implementation details such as specific frameworks, APIs, databases, repositories, deployment technologies, and infrastructure are left for the **Design phase**.
 
-- **Boundary** — interaction with the user or external input
-- **Control** — coordinates system operations
-- **Entity** — represents domain information
+This separation keeps the analysis focused on **what the system does and what concepts are involved**, rather than how the system will be implemented.
 
-The BCE model is documented in:
+## 5. Transition to Design
 
-`docs/domain/bce_domain_class_diagram.svg`
+The remaining implementation and architectural decisions will be addressed in the **Design phase**.
 
-Implementation details such as databases, repositories, APIs, and message brokers are intentionally excluded from this model.
+The design will translate the analysis results into an implementable software structure, including:
 
----
-
-## 5. Dynamic Analysis
-
-**Sequence Diagrams** were used to describe the interactions between actors, boundaries, controls, and entities for the main use cases.
-
-The diagrams remain at the conceptual level and do not include implementation-specific details.
-
----
-
-## 6. Analysis Result
-
-The analysis established:
-
-- The main system functionality through Use Cases
-- The main domain concepts through the BCE model
-- Object responsibilities
-- The interactions between system objects through Sequence Diagrams
-- The conceptual measurement → anomaly detection → alert flow
-
-These results provide the basis for the **System Design** phase.
-
----
-
-## 7. Analysis → Design
-
-The analysis answers:
-
-> **What does the system do and what are its main concepts and interactions?**
-
-The following System Design phase will determine:
-
-> **How will the system be implemented?**
+- software components,
+- frontend components,
+- backend services and APIs,
+- data persistence,
+- system architecture,
+- and infrastructure concerns.
