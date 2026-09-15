@@ -112,4 +112,4 @@ Related functionality should stay together, while unnecessary dependencies betwe
 
 For example, measurement-related operations should remain within the appropriate measurement-related components, while measurement processing logic should not depend directly on the database implementation. This makes the system easier to maintain and change.
 
-Together, these choices aim to produce software that is **modular, understandable, testable, and ovreall maintainable, and reliable**.
+Together, these choices aim to produce software that is **modular, understandable, testable and overall maintainable-reliable**.
