@@ -185,32 +185,7 @@ centralized and consistent across all modules. Detailed implementation
 documentation.
 
 ---
-
-## 9. MQTT Data Ingestion and Reliability
-
-The MQTT consumer uses a persistent session with QoS 1 to provide
-at-least-once delivery and improve resilience against transient
-disconnects.
-
-Since QoS 1 can result in duplicate deliveries, the ingestion layer
-performs duplicate detection before persisting measurements or feeding
-them into stateful stream-processing models such as anomaly detection.
-
-Messages that fail validation (e.g. malformed payloads or out-of-range
-values) are logged and discarded rather than silently dropped, ensuring
-traceability without blocking the ingestion pipeline.
-
-### Why?
-
-QoS 1 offers a good balance between reliability and complexity
-compared to QoS 0 and QoS 2. Since duplicate messages are possible
-under QoS 1, duplicate detection protects the correctness of stateful
-online processing, where processing the same measurement more than
-once could affect subsequent anomaly-detection results.
-
----
-
-## 10. Machine Learning and Stream Processing
+## 9. Machine Learning and Stream Processing
 
 AgroMonitor uses online anomaly detection for incoming sensor data.
 
@@ -240,6 +215,21 @@ Keeping the ML processing in the existing backend also avoids
 introducing a separate ML service at the current scale.
 
 ---
+
+### 10.MQTT QoS and Duplicate Handling
+
+The initial implementation uses MQTT QoS 0 because the system operates with a small, controlled simulated sensor workload. QoS 0 does not guarantee message delivery, but the initial system accepts this risk in exchange for lower protocol overhead and simpler processing. The expected message volume and controlled environment make occasional message loss an acceptable trade-off for the initial implementation.
+
+If the system is later deployed at larger scale or measurement delivery becomes a stricter reliability requirement, MQTT QoS 1 can be introduced. QoS 1 provides at-least-once delivery but allows the same message to be delivered more than once.
+
+Duplicate delivery is particularly relevant for AgroMonitor because measurements are processed by the online anomaly detection model as they arrive. Since the model is stateful and may update its learned state from incoming measurements, processing the same measurement more than once could affect the model's state and learning behaviour. It could also cause repeated anomaly detection or duplicate alert generation.
+
+Application-level deduplication can then be introduced when the MQTT payload contract is defined. The exact deduplication mechanism will depend on how the sensor messages identify individual measurements. This keeps the initial implementation simple without committing the current database design to additional message-identity fields or infrastructure before they are required.
+
+
+---
+
+
 
 ## 11. Future Scalability and Evolution
 
