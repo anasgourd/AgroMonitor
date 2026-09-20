@@ -89,7 +89,26 @@ FastAPI uses these schemas for validation, serialization, and API documentation.
 
 ---
 
-## 2. Error Handling
+## 2.Analysis-to-Design Mapping
+
+The LLD implementation is derived from the analysis models developed for the View Sensors use case.
+
+The BCE model identified the main responsibilities involved in the use case:
+
+Analysis component	Design / Implementation component
+ViewSensorGUI	React Sensor View
+SensorController	SensorRouter + SensorService
+Sensor	SQLAlchemy Sensor model
+
+The BCE model helped identify the responsibilities involved in retrieving and displaying sensors without introducing implementation details.
+
+The sequence diagram then defined the order of interactions between these responsibilities, from the user's request to the retrieval and presentation of sensor data.
+
+During LLD, these responsibilities were refined into concrete implementation components. The FastAPI Router handles the HTTP request, the SensorService coordinates the operation, and the SensorRepository handles database access through SQLAlchemy.
+
+The analysis models therefore provided the conceptual structure, while the LLD translated these responsibilities into concrete implementation components and technologies.
+
+## 3. Error Handling
 
 Application-level errors are handled by the Service layer, while HTTP-specific responses are handled by the Router.
 
@@ -105,7 +124,7 @@ This keeps application logic separate from HTTP representation.
 
 ---
 
-## 3. Dependency Injection
+## 4. Dependency Injection
 
 FastAPI's dependency injection mechanism (`Depends`) is used to provide Services, Repositories, and database sessions to the API layer.
 
