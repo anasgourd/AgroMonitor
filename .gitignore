@@ -7,6 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Frontend
 node_modules
 dist
 dist-ssr
@@ -23,8 +24,20 @@ dist-ssr
 *.sln
 *.sw?
 
-
+# SonarQube
 .scannerwork/
 
+# Test coverage
 coverage/
-node_modules/
+
+# Python / Backend
+backend/.venv/
+backend/__pycache__/
+backend/**/*.pyc
+
+# Environment variables
+.env
+backend/.env
+
+# Python test cache
+.pytest_cache/
