@@ -14,6 +14,7 @@ class UserService:
     def create_user(self, user_data: UserCreate) -> User:
         # Password hashing will be added here.
         return self.repository.create(user_data)
+        
     def get_user(self,user_id: int) -> User:
         return self.repository.get_user(user_id)
     

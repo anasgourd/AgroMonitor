@@ -2,7 +2,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.user import UserCreate, UserResponse, UserUpdate
+from app.schemas.field import FieldResponse,FieldCreate
 from app.services.user_service import UserService
+from app.services.field_service import FieldService
 from fastapi import HTTPException
 
 router = APIRouter(
@@ -68,3 +70,51 @@ def delete_user(
             status_code=404,
             detail="User not found"
         )
+   
+# These endpoints are nested under a user (/users/{user_id}/...)
+# because the user is the parent resource of the field.     
+
+@router.get("/{user_id}/fields", response_model=list[FieldResponse])
+def get_user_fields(user_id: int, db: Session = Depends(get_db)):
+    service = FieldService(db)
+    user_service = UserService(db)
+    
+    fields = service.get_user_fields(user_id)
+    user = user_service.get_user(user_id)
+    
+    if user is None:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+    if fields is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Fields not found"
+        )
+    return fields
+
+@router.post(
+    "/{user_id}/fields",
+    response_model=FieldResponse,
+    status_code=201
+)
+# user_id is taken from the path, while field_data is received in the request body.
+def create_field(
+    user_id: int,
+    field_data: FieldCreate,
+    db: Session = Depends(get_db)
+):
+    user_service = UserService(db)
+
+    user = user_service.get_user(user_id)
+
+    if user is None:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    field_service = FieldService(db)
+
+    return field_service.create_field(user_id, field_data)
