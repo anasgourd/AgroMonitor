@@ -5,6 +5,8 @@ from app.schemas.measurement import MeasurementInput
 from app.services.measurement_service import MeasurementService
 from sqlalchemy.orm import Session
 from pydantic import ValidationError
+from app.exceptions.measurement import SensorNotFoundError,InactiveSensorError,FutureMeasurementTimestampError
+
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +63,24 @@ class MQTTConsumer:
             measurement.sensor_id
         )
         #consumer calling the measurement service
-        self.measurement_service.record_measurement(measurement)
+        try:
+            self.measurement_service.record_measurement(measurement)
+
+        except SensorNotFoundError:
+            logger.warning(
+                "MQTT measurement rejected: sensor %s not found",
+                measurement.sensor_id
+            )
+
+        except InactiveSensorError:
+            logger.warning(
+                "MQTT measurement rejected: sensor %s is inactive",
+                measurement.sensor_id
+            )
+        except FutureMeasurementTimestampError:
+            logger.warning(
+                "MQTT measurement rejected: timestamp is in the future"
+            )
 
     def start(self):
         self.client.connect(self.broker, self.port)
