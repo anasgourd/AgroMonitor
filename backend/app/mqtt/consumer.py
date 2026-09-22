@@ -4,6 +4,7 @@ import json
 from app.schemas.measurement import MeasurementInput
 from app.services.measurement_service import MeasurementService
 from sqlalchemy.orm import Session
+from pydantic import ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -40,9 +41,20 @@ class MQTTConsumer:
             payload
         )
 
-        data = json.loads(payload)
-        #dictionary unpacking of the data of the payload to the measurement object
-        measurement = MeasurementInput(**data)
+        #catching validation errors in the payload
+        try:
+            data = json.loads(payload)
+            if not isinstance(data, dict):
+                raise ValueError("MQTT payload must be a JSON object")
+            #dictionary unpacking of the data of the payload to the measurement object
+            measurement = MeasurementInput(**data)
+
+        except (json.JSONDecodeError, ValidationError, ValueError):
+            logger.warning(
+                "Invalid MQTT measurement payload: %s",
+                payload
+            )
+            return
 
         logger.info(
             "Measurement payload validated for sensor %s",

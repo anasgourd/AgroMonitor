@@ -11,10 +11,12 @@ TOPIC = "agromonitor/sensors"
 def main():
     payload = {
         "sensor_id": 1,
-        "value": 24.5,
+        "value": 5,
         "timestamp": "2026-09-22T20:00:00Z",
         "unit": "C"
     }
+    #payload = "invalid json"
+    
 
     publish.single(
         TOPIC,
