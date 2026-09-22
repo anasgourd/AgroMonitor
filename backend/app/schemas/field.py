@@ -17,3 +17,9 @@ class FieldResponse(BaseModel):
     model_config = {
         "from_attributes": True
     }
+    
+
+class FieldUpdate(BaseModel):
+    field_name: str
+    type: str
+    area: float

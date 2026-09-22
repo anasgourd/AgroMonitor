@@ -87,11 +87,7 @@ def get_user_fields(user_id: int, db: Session = Depends(get_db)):
             status_code=404,
             detail="User not found"
         )
-    if fields is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Fields not found"
-        )
+ 
     return fields
 
 @router.post(

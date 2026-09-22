@@ -20,3 +20,10 @@ class FieldService:
     def get_user_fields(self, user_id: int) -> list[Field]  | None:
 
         return self.repository.get_by_user_id(user_id)
+    
+    def get_field(self, field_id: int):
+        return self.repository.get_by_id(field_id)
+    def update_field(self, field_id: int, field_data):
+        return self.repository.update(field_id, field_data)
+    def delete_field(self, field_id: int):
+        return self.repository.delete(field_id)
