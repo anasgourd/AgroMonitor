@@ -5,6 +5,7 @@ from app.api.field_router import router as field_router
 from app.api.sensor_router import router as sensor_router
 from app.api.measurement_router import router as measurement_router
 from app.api.alert_router import router as alert_router
+from app.logging_config import setup_logging
 
 
 app = FastAPI(
@@ -12,6 +13,7 @@ app = FastAPI(
     version="0.1.0"
 )
 
+setup_logging()
 
 app.include_router(user_router)
 app.include_router(field_router)

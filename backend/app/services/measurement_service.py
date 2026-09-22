@@ -10,7 +10,9 @@ from app.exceptions.measurement import (
     InactiveSensorError,
     FutureMeasurementTimestampError
 )
+import logging
 
+logger = logging.getLogger(__name__)
 
 class MeasurementService:
     def __init__(self, db: Session):
@@ -36,20 +38,38 @@ class MeasurementService:
         sensor = sensor_service.get_sensor(measurement_data.sensor_id)
 
         if sensor is None:
+            logger.warning(
+                "Measurement rejected: sensor %s not found",
+                measurement_data.sensor_id
+            )
             raise SensorNotFoundError()
         
         if sensor.status != "active":
+            logger.warning(
+            "Measurement rejected: sensor %s is inactive",
+            measurement_data.sensor_id
+            )
             raise InactiveSensorError()
         
         if measurement_data.timestamp > datetime.now():
+            logger.warning(
+                "Measurement rejected: timestamp is in the future"
+            )
             raise FutureMeasurementTimestampError()
 
         # Temporary anomaly detection
         is_anomalous = False
 
-        return self.repository.create(
+        measurement = self.repository.create(
             measurement_data,
             is_anomalous
         )
+
+        logger.info(
+            "Measurement %s stored successfully",
+            measurement.measurement_id
+        )
+
+        return measurement
         
         
