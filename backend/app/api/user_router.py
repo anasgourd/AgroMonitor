@@ -6,6 +6,8 @@ from app.schemas.field import FieldResponse,FieldCreate
 from app.services.user_service import UserService
 from app.services.field_service import FieldService
 from fastapi import HTTPException
+from app.schemas.alert import AlertResponse
+from app.services.alert_service import AlertService
 
 router = APIRouter(
     prefix="/users",
@@ -114,3 +116,25 @@ def create_field(
     field_service = FieldService(db)
 
     return field_service.create_field(user_id, field_data)
+
+@router.get(
+    "/{user_id}/alerts",
+    response_model=list[AlertResponse]
+)
+def get_user_alerts(
+    user_id: int,
+    db: Session = Depends(get_db)
+) -> list[AlertResponse]:
+
+    user_service = UserService(db)
+    alert_service = AlertService(db)
+
+    user = user_service.get_user(user_id)
+
+    if user is None:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    return alert_service.get_user_alerts(user_id)

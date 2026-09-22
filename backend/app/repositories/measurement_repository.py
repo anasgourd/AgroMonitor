@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.models.measurement import Measurement
-
+from app.schemas.measurement import MeasurementInput
 
 class MeasurementRepository:
     def __init__(self, db: Session):
@@ -28,3 +28,22 @@ class MeasurementRepository:
             .filter(Measurement.measurement_id == measurement_id)
             .first()
         )
+    
+    def create(
+        self,
+        measurement_data: MeasurementInput,
+        is_anomalous: bool
+    ) -> Measurement:
+        measurement = Measurement(
+            sensor_id=measurement_data.sensor_id,
+            value=measurement_data.value,
+            timestamp=measurement_data.timestamp,
+            unit=measurement_data.unit,
+            is_anomalous=is_anomalous,
+        )
+
+        self.db.add(measurement)
+        self.db.commit()
+        self.db.refresh(measurement)
+
+        return measurement

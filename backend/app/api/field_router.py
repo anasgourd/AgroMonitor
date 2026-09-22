@@ -8,6 +8,8 @@ from app.schemas.sensor import SensorResponse
 from app.services.sensor_service import SensorService
 from app.schemas.sensor import SensorResponse,SensorCreate
 from app.models.sensor import Sensor
+from app.schemas.alert import AlertResponse
+from app.services.alert_service import AlertService
 
 
 router = APIRouter(
@@ -111,3 +113,26 @@ def create_sensor(
         )
 
     return service.create_sensor(field_id, sensor_data)
+
+#endpoint for get alerts of the assosiated field
+@router.get(
+    "/{field_id}/alerts",
+    response_model=list[AlertResponse]
+)
+def get_field_alerts(
+    field_id: int,
+    db: Session = Depends(get_db)
+) -> list[AlertResponse]:
+
+    field_service = FieldService(db)
+    alert_service = AlertService(db)
+
+    field = field_service.get_field(field_id)
+
+    if field is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Field not found"
+        )
+
+    return alert_service.get_field_alerts(field_id)
