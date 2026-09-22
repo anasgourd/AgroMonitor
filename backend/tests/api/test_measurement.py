@@ -71,3 +71,25 @@ def test_get_measurement_invalid_id():
 
     assert response.status_code == 422
     
+#test for checking the measurmeent input
+def test_record_measurement():
+    response = client.post(
+        "/measurements",
+        json={
+            "sensor_id": 1,
+            "value": 26.5,
+            "timestamp": "2026-09-22T17:00:00",
+            "unit": "°C"
+        }
+    )
+
+    assert response.status_code == 201
+
+    data = response.json()
+
+    assert "measurement_id" in data
+    assert data["sensor_id"] == 1
+    assert data["value"] == 26.5
+    assert data["unit"] == "°C"
+    assert data["is_anomalous"] is False
+    assert "timestamp" in data

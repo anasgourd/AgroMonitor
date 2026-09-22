@@ -2,9 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.schemas.measurement import MeasurementResponse
+from app.schemas.measurement import MeasurementResponse,MeasurementInput
 from app.services.measurement_service import MeasurementService
-
 
 router = APIRouter(
     prefix="/measurements",
@@ -32,3 +31,17 @@ def get_measurement(
         )
 
     return measurement
+
+#temorary endpoint for checking the measurement input 
+@router.post(
+    "",
+    response_model=MeasurementResponse,
+    status_code=201
+)
+def record_measurement(
+    measurement_data: MeasurementInput,
+    db: Session = Depends(get_db)
+) -> MeasurementResponse:
+    service = MeasurementService(db)
+
+    return service.record_measurement(measurement_data)
