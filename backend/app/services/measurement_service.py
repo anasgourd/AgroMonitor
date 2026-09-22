@@ -4,7 +4,7 @@ from app.repositories.measurement_repository import MeasurementRepository
 from app.schemas.measurement import MeasurementInput
 
 from app.services.sensor_service import SensorService
-from datetime import datetime
+from datetime import datetime, timezone
 from app.exceptions.measurement import (
     SensorNotFoundError,
     InactiveSensorError,
@@ -51,7 +51,8 @@ class MeasurementService:
             )
             raise InactiveSensorError()
         
-        if measurement_data.timestamp > datetime.now():
+        # Compare timezone-aware timestamps using UTC
+        if measurement_data.timestamp > datetime.now(timezone.utc):
             logger.warning(
                 "Measurement rejected: timestamp is in the future"
             )
