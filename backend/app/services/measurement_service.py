@@ -5,7 +5,12 @@ from app.schemas.measurement import MeasurementInput
 
 from app.services.sensor_service import SensorService
 from datetime import datetime
-from fastapi import HTTPException
+from app.exceptions.measurement import (
+    SensorNotFoundError,
+    InactiveSensorError,
+    FutureMeasurementTimestampError
+)
+
 
 class MeasurementService:
     def __init__(self, db: Session):
@@ -31,21 +36,13 @@ class MeasurementService:
         sensor = sensor_service.get_sensor(measurement_data.sensor_id)
 
         if sensor is None:
-            raise HTTPException(
-                status_code=404,
-            detail="Sensor not found"
-        )
+            raise SensorNotFoundError()
+        
         if sensor.status != "active":
-            raise HTTPException(
-                status_code=400,
-                detail="Sensor is inactive"
-            )
+            raise InactiveSensorError()
         
         if measurement_data.timestamp > datetime.now():
-            raise HTTPException(
-                status_code=400,
-                detail="Measurement timestamp cannot be in the future"
-            )
+            raise FutureMeasurementTimestampError()
 
         # Temporary anomaly detection
         is_anomalous = False

@@ -4,6 +4,11 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.measurement import MeasurementResponse,MeasurementInput
 from app.services.measurement_service import MeasurementService
+from app.exceptions.measurement import (
+    SensorNotFoundError,
+    InactiveSensorError,
+    FutureMeasurementTimestampError
+)
 
 router = APIRouter(
     prefix="/measurements",
@@ -44,4 +49,23 @@ def record_measurement(
 ) -> MeasurementResponse:
     service = MeasurementService(db)
 
-    return service.record_measurement(measurement_data)
+    try:
+        return service.record_measurement(measurement_data)
+
+    except SensorNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="Sensor not found"
+        )
+
+    except InactiveSensorError:
+        raise HTTPException(
+            status_code=400,
+            detail="Sensor is inactive"
+        )
+
+    except FutureMeasurementTimestampError:
+        raise HTTPException(
+            status_code=400,
+            detail="Measurement timestamp cannot be in the future"
+        )
