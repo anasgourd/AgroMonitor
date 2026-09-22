@@ -71,7 +71,8 @@ def test_get_measurement_invalid_id():
 
     assert response.status_code == 422
     
-#test for checking the measurmeent input
+#test for checking the measurement input.
+#there will be no post for measurments but we use these to chekc the application flow
 def test_record_measurement():
     response = client.post(
         "/measurements",
@@ -93,3 +94,64 @@ def test_record_measurement():
     assert data["unit"] == "°C"
     assert data["is_anomalous"] is False
     assert "timestamp" in data
+
+# POST /measurements - sensor validation
+
+def test_record_measurement_sensor_not_found():
+    response = client.post(
+        "/measurements",
+        json={
+            "sensor_id": 999999,
+            "value": 26.5,
+            "timestamp": "2026-09-22T17:00:00",
+            "unit": "°C"
+        }
+    )
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Sensor not found"
+
+# POST /measurements - sensor status validation
+
+def test_record_measurement_inactive_sensor():
+    create_response = client.post(
+        "/fields/3/sensors",
+        json={
+            "sensor_name": "Inactive Test Sensor",
+            "status": "inactive"
+        }
+    )
+
+    assert create_response.status_code == 201
+
+    sensor_id = create_response.json()["sensor_id"]
+
+    response = client.post(
+        "/measurements",
+        json={
+            "sensor_id": sensor_id,
+            "value": 26.5,
+            "timestamp": "2026-09-22T17:00:00",
+            "unit": "°C"
+        }
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Sensor is inactive"
+    
+
+# POST /measurements - future timestamp
+
+def test_record_measurement_future_timestamp():
+    response = client.post(
+        "/measurements",
+        json={
+            "sensor_id": 1,
+            "value": 26.5,
+            "timestamp": "2099-01-01T17:00:00",
+            "unit": "°C"
+        }
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Measurement timestamp cannot be in the future"

@@ -129,10 +129,10 @@ def test_get_sensor_invalid_id():
 
 def test_update_sensor():
     response = client.put(
-        "/sensors/1",
+        "/sensors/3",
         json={
             "sensor_name": "Updated Temperature Sensor",
-            "status": "inactive"
+            "status": "active"
         }
     )
 
@@ -140,10 +140,10 @@ def test_update_sensor():
 
     data = response.json()
 
-    assert data["sensor_id"] == 1
+    assert data["sensor_id"] == 3
     assert data["field_id"] == 3
     assert data["sensor_name"] == "Updated Temperature Sensor"
-    assert data["status"] == "inactive"
+    assert data["status"] == "active"
 
 
 def test_update_sensor_not_found():
