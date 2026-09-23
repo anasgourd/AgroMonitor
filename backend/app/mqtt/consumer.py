@@ -3,10 +3,10 @@ import paho.mqtt.client as mqtt
 import json
 from app.schemas.measurement import MeasurementInput
 from app.services.measurement_service import MeasurementService
-from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 from pydantic import ValidationError
 from app.exceptions.measurement import SensorNotFoundError,InactiveSensorError,FutureMeasurementTimestampError
+from sqlalchemy.exc import SQLAlchemyError
 
 
 logger = logging.getLogger(__name__)
@@ -36,9 +36,17 @@ class MQTTConsumer:
         logger.info("Connected to MQTT broker")
         client.subscribe("agromonitor/sensors")
 
-    def on_message(self, client, userdata, message):
-        payload = message.payload.decode()
+    def on_message(self, _client, _userdata, message):
+        
+        try:
+            payload = message.payload.decode()
 
+        except UnicodeDecodeError:
+            logger.warning(
+                "Invalid MQTT payload encoding"
+            )
+            return
+        
         logger.info(
             "MQTT message received on topic %s: %s",
             message.topic,
@@ -87,6 +95,10 @@ class MQTTConsumer:
         except FutureMeasurementTimestampError:
             logger.warning(
                 "MQTT measurement rejected: timestamp is in the future"
+            )
+        except SQLAlchemyError:
+            logger.exception(
+                "Database error while processing MQTT measurement"
             )
 
         finally:

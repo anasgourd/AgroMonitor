@@ -6,7 +6,7 @@ from app.exceptions.measurement import (
     InactiveSensorError,
     FutureMeasurementTimestampError,
 )
-
+from sqlalchemy.exc import SQLAlchemyError
 
 
 def create_consumer():
@@ -174,3 +174,56 @@ def test_future_timestamp_is_handled():
     # The consumer should handle the rejection without crashing.
     consumer.on_message(None, None, message)
 
+def test_database_error_is_handled():
+    consumer, measurement_service = create_consumer()
+
+    payload = {
+        "sensor_id": 1,
+        "value": 24.5,
+        "timestamp": "2026-09-22T20:00:00Z",
+        "unit": "C"
+    }
+
+    # Simulate a database error while storing the measurement.
+    measurement_service.record_measurement.side_effect = (
+        SQLAlchemyError()
+    )
+
+    message = create_message(json.dumps(payload))
+
+    # The consumer should catch the database error
+    # without crashing the MQTT processing loop.
+    consumer.on_message(None, None, message)
+
+def test_database_session_is_closed():
+    consumer, measurement_service = create_consumer()
+
+    payload = {
+        "sensor_id": 1,
+        "value": 24.5,
+        "timestamp": "2026-09-22T20:00:00Z",
+        "unit": "C"
+    }
+
+    message = create_message(json.dumps(payload))
+
+    consumer.on_message(None, None, message)
+
+    db = consumer.session_factory.return_value
+
+    # The database session should always be closed
+    # after processing the MQTT message.
+    db.close.assert_called_once()
+
+def test_invalid_payload_encoding_is_rejected():
+    consumer, measurement_service = create_consumer()
+
+    message = MagicMock()
+    message.topic = "agromonitor/sensors"
+    message.payload = b"\xff\xfe\xfd"
+
+    # Invalid UTF-8 payloads should be rejected
+    # before reaching the measurement service.
+    consumer.on_message(None, None, message)
+
+    measurement_service.record_measurement.assert_not_called()
