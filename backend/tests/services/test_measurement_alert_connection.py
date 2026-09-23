@@ -60,7 +60,7 @@ def test_anomalous_measurement_creates_one_alert():
 
     measurement_data = MeasurementInput(
         sensor_id=1,
-        value=35.0,
+        value=85.0,
         timestamp=datetime.now(timezone.utc),
         unit="C",
     )
@@ -68,7 +68,7 @@ def test_anomalous_measurement_creates_one_alert():
     measurement = Measurement(
         measurement_id=1,
         sensor_id=1,
-        value=35.0,
+        value=85.0,
         timestamp=measurement_data.timestamp,
         unit="C",
         is_anomalous=True,

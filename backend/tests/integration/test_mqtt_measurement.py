@@ -19,7 +19,7 @@ def test_anomalous_mqtt_measurement_creates_alert():
 
         payload = {
             "sensor_id": 1,
-            "value": 35.0,
+            "value": 85.0,
             "timestamp": "2026-09-22T20:00:00Z",
             "unit": "C",
         }
@@ -43,7 +43,7 @@ def test_anomalous_mqtt_measurement_creates_alert():
         )
 
         assert measurement is not None
-        assert measurement.value == 35.0
+        assert measurement.value == 85.0
         assert measurement.is_anomalous is True
 
         alert = (
