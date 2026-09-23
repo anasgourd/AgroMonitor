@@ -9,14 +9,14 @@ TOPIC = "agromonitor/sensors"
 
 
 def main():
+    payload = {
+        "sensor_id": 1,
+        "value": 1000,
+        "timestamp": "2026-09-22T20:00:00Z",
+        "unit": "C"
+    }
+    # payload = "invalid json"
     # payload = {
-    #     "sensor_id": 1,
-    #     "value": 5,
-    #     "timestamp": "2026-09-22T20:00:00Z",
-    #     "unit": "C"
-    # }
-    #payload = "invalid json"
-    #payload = {
     # "sensor_id": 999,
     # "value": 24.5,
     # "timestamp": "2026-09-22T20:00:00Z",
@@ -28,12 +28,12 @@ def main():
     #     "timestamp": "2026-09-22T20:00:00Z",
     #     "unit": "C"
     # }
-    payload = {
-        "sensor_id": 1,
-        "value": 24.5,
-        "timestamp": "2030-01-01T20:00:00Z",
-        "unit": "C"
-    }
+    # payload = {
+    #     "sensor_id": 1,
+    #     "value": 24.5,
+    #     "timestamp": "2030-01-01T20:00:00Z",
+    #     "unit": "C"
+    # }
     
 
     publish.single(

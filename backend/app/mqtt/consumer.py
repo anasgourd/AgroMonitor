@@ -4,6 +4,7 @@ import json
 from app.schemas.measurement import MeasurementInput
 from app.services.measurement_service import MeasurementService
 from sqlalchemy.orm import Session
+from sqlalchemy.orm import sessionmaker
 from pydantic import ValidationError
 from app.exceptions.measurement import SensorNotFoundError,InactiveSensorError,FutureMeasurementTimestampError
 
@@ -16,12 +17,13 @@ class MQTTConsumer:
         self,
         broker: str,
         port: int,
-        db: Session
+        session_factory: sessionmaker,
+        service_factory=MeasurementService
     ):
         self.broker = broker
         self.port = port
-        self.db = db
-        self.measurement_service = MeasurementService(db)
+        self.session_factory = session_factory
+        self.service_factory = service_factory
 
         self.client = mqtt.Client(
             mqtt.CallbackAPIVersion.VERSION2
@@ -42,7 +44,7 @@ class MQTTConsumer:
             message.topic,
             payload
         )
-
+        
         #catching validation errors in the payload
         try:
             data = json.loads(payload)
@@ -62,9 +64,13 @@ class MQTTConsumer:
             "Measurement payload validated for sensor %s",
             measurement.sensor_id
         )
-        #consumer calling the measurement service
+        
+        db = self.session_factory()
+
         try:
-            self.measurement_service.record_measurement(measurement)
+            #consumer calling the measurement service
+            measurement_service = self.service_factory(db)
+            measurement_service.record_measurement(measurement)
 
         except SensorNotFoundError:
             logger.warning(
@@ -77,11 +83,19 @@ class MQTTConsumer:
                 "MQTT measurement rejected: sensor %s is inactive",
                 measurement.sensor_id
             )
+
         except FutureMeasurementTimestampError:
             logger.warning(
                 "MQTT measurement rejected: timestamp is in the future"
             )
 
+        finally:
+            db.close()
+
     def start(self):
         self.client.connect(self.broker, self.port)
-        self.client.loop_forever()
+        self.client.loop_start()
+    
+    def stop(self):
+        self.client.disconnect()
+        self.client.loop_stop()

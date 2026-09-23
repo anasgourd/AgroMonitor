@@ -1,6 +1,5 @@
 import json
-from unittest.mock import MagicMock
-
+from unittest.mock import MagicMock, patch
 from app.mqtt.consumer import MQTTConsumer
 from app.exceptions.measurement import (
     SensorNotFoundError,
@@ -14,18 +13,33 @@ def create_consumer():
     # and do not need a real database connection.
     db = MagicMock()
 
+    session_factory = MagicMock(return_value=db)
+
     consumer = MQTTConsumer(
         broker="localhost",
         port=1883,
-        db=db
+        session_factory=session_factory
     )
-
-    # Replace the real service with a mock so we can verify
-    # how the consumer interacts with the MeasurementService.
-    consumer.measurement_service = MagicMock()
 
     return consumer
 
+def create_consumer():
+    db = MagicMock()
+    session_factory = MagicMock(return_value=db)
+    measurement_service = MagicMock()
+
+    service_factory = MagicMock(
+        return_value=measurement_service
+    )
+
+    consumer = MQTTConsumer(
+        broker="localhost",
+        port=1883,
+        session_factory=session_factory,
+        service_factory=service_factory
+    )
+
+    return consumer, measurement_service
 
 def create_message(payload):
     # Create a mock MQTT message with the same attributes
@@ -38,7 +52,7 @@ def create_message(payload):
 
 
 def test_valid_measurement_calls_service():
-    consumer = create_consumer()
+    consumer, measurement_service = create_consumer()
 
     payload = {
         "sensor_id": 1,
@@ -52,12 +66,12 @@ def test_valid_measurement_calls_service():
     consumer.on_message(None, None, message)
 
     # A valid MQTT payload should reach the MeasurementService.
-    consumer.measurement_service.record_measurement.assert_called_once()
+    measurement_service.record_measurement.assert_called_once()
 
     # Verify that the JSON payload was converted into the correct
     # MeasurementInput before being passed to the service.
     measurement = (
-        consumer.measurement_service.record_measurement.call_args.args[0]
+        measurement_service.record_measurement.call_args.args[0]
     )
 
     assert measurement.sensor_id == 1
@@ -67,18 +81,18 @@ def test_valid_measurement_calls_service():
 
 
 def test_invalid_json_is_rejected():
-    consumer = create_consumer()
+    consumer, measurement_service = create_consumer()
 
     message = create_message("invalid json")
 
     consumer.on_message(None, None, message)
 
     # Invalid JSON should be discarded before reaching the service.
-    consumer.measurement_service.record_measurement.assert_not_called()
+    measurement_service.record_measurement.assert_not_called()
 
 
 def test_non_object_json_is_rejected():
-    consumer = create_consumer()
+    consumer, measurement_service = create_consumer()
 
     message = create_message(json.dumps("invalid json"))
 
@@ -86,11 +100,11 @@ def test_non_object_json_is_rejected():
 
     # The MQTT payload must be a JSON object because MeasurementInput
     # is constructed using the object's fields.
-    consumer.measurement_service.record_measurement.assert_not_called()
+    measurement_service.record_measurement.assert_not_called()
 
 
 def test_invalid_measurement_payload_is_rejected():
-    consumer = create_consumer()
+    consumer, measurement_service = create_consumer()
 
     payload = {
         "sensor_id": 1,
@@ -103,11 +117,11 @@ def test_invalid_measurement_payload_is_rejected():
 
     # Missing required MeasurementInput fields should prevent
     # the invalid measurement from reaching the service.
-    consumer.measurement_service.record_measurement.assert_not_called()
+    measurement_service.record_measurement.assert_not_called()
 
 
 def test_sensor_not_found_is_handled():
-    consumer = create_consumer()
+    consumer, measurement_service = create_consumer()
 
     payload = {
         "sensor_id": 999,
@@ -118,7 +132,7 @@ def test_sensor_not_found_is_handled():
 
     # Simulate the business exception raised by the service
     # when the sensor does not exist.
-    consumer.measurement_service.record_measurement.side_effect = (
+    measurement_service.record_measurement.side_effect = (
         SensorNotFoundError()
     )
 
@@ -130,7 +144,7 @@ def test_sensor_not_found_is_handled():
 
 
 def test_inactive_sensor_is_handled():
-    consumer = create_consumer()
+    consumer, measurement_service = create_consumer()
 
     payload = {
         "sensor_id": 1,
@@ -141,7 +155,7 @@ def test_inactive_sensor_is_handled():
 
     # Simulate the business exception raised by the service
     # when the sensor is inactive.
-    consumer.measurement_service.record_measurement.side_effect = (
+    measurement_service.record_measurement.side_effect = (
         InactiveSensorError()
     )
 
@@ -152,8 +166,7 @@ def test_inactive_sensor_is_handled():
 
 
 def test_future_timestamp_is_handled():
-    consumer = create_consumer()
-
+    consumer, measurement_service = create_consumer()
     payload = {
         "sensor_id": 1,
         "value": 24.5,
@@ -163,7 +176,7 @@ def test_future_timestamp_is_handled():
 
     # Simulate the business exception raised by the service
     # when the measurement timestamp is in the future.
-    consumer.measurement_service.record_measurement.side_effect = (
+    measurement_service.record_measurement.side_effect = (
         FutureMeasurementTimestampError()
     )
 
