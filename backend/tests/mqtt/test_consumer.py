@@ -1,5 +1,5 @@
 import json
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 from app.mqtt.consumer import MQTTConsumer
 from app.exceptions.measurement import (
     SensorNotFoundError,
@@ -8,22 +8,11 @@ from app.exceptions.measurement import (
 )
 
 
+
 def create_consumer():
+
     # Use a mock database because these tests focus on the MQTT consumer
-    # and do not need a real database connection.
-    db = MagicMock()
-
-    session_factory = MagicMock(return_value=db)
-
-    consumer = MQTTConsumer(
-        broker="localhost",
-        port=1883,
-        session_factory=session_factory
-    )
-
-    return consumer
-
-def create_consumer():
+    # and do not need a real database connection.  
     db = MagicMock()
     session_factory = MagicMock(return_value=db)
     measurement_service = MagicMock()

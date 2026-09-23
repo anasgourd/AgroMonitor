@@ -4,6 +4,7 @@ from app.models.alert import Alert
 from app.models.measurement import Measurement
 from app.models.sensor import Sensor
 from app.models.field import Field
+from datetime import datetime
 
 
 class AlertRepository:
@@ -62,3 +63,22 @@ class AlertRepository:
             .filter(Alert.alert_id == alert_id)
             .first()
         )
+
+    def create(
+        self,
+        measurement_id: int,
+        message: str,
+        timestamp: datetime
+    ) -> Alert:
+
+        alert = Alert(
+            measurement_id=measurement_id,
+            message=message,
+            timestamp=timestamp
+        )
+
+        self.db.add(alert)
+        self.db.commit()
+        self.db.refresh(alert)
+
+        return alert

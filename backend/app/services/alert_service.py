@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from app.models.alert import Alert
 from app.repositories.alert_repository import AlertRepository
-
+from datetime import datetime
 
 class AlertService:
     def __init__(self, db: Session):
@@ -28,3 +28,16 @@ class AlertService:
         alert_id: int
     ) -> Alert | None:
         return self.repository.get_by_id(alert_id)
+    
+    def create_alert(
+        self,
+        measurement_id: int,
+        message: str,
+        timestamp: datetime
+    ) -> Alert:
+
+        return self.repository.create(
+            measurement_id,
+            message,
+            timestamp
+        )
