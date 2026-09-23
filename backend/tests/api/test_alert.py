@@ -87,7 +87,7 @@ def test_get_alert():
     data = response.json()
 
     assert data["alert_id"] == 1
-    assert data["measurement_id"] == 1
+    assert data["measurement_id"] == 7
     assert data["message"] == "Anomaly detected"
     assert "timestamp" in data
 

@@ -2,10 +2,10 @@ import csv
 import json
 import os
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
-import paho.mqtt.publish as publish
+import paho.mqtt.client as mqtt
 
 
 BROKER = os.getenv("MQTT_BROKER", "localhost")
@@ -14,19 +14,22 @@ TOPIC = "agromonitor/sensors"
 
 DATA_FILE = Path(__file__).resolve().parents[1] / "data" / "data.csv"
 
-DELAY_SECONDS = 0.01
-MAX_MEASUREMENTS = None
+DELAY_SECONDS = 0.1
+MAX_MEASUREMENTS = 10
 
 
 def main():
-    
     published_count = 0
+
+    client = mqtt.Client()
+    client.connect(BROKER, PORT, 60)
+
     with open(DATA_FILE, newline="") as file:
         reader = csv.reader(file)
 
-        for  row in reader:
-            # if i >= MAX_MEASUREMENTS:
-            #     break
+        for i, row in enumerate(reader):
+            if i >= MAX_MEASUREMENTS:
+                break
 
             value = float(row[0])
             timestamp = datetime.now(timezone.utc)
@@ -38,19 +41,19 @@ def main():
                 "unit": "C",
             }
 
-            publish.single(
+            client.publish(
                 TOPIC,
                 payload=json.dumps(payload),
-                hostname=BROKER,
-                port=PORT,
             )
-            published_count += 1
-            #print(f"Published #{published_count}: {payload}")
 
-            
-            
+            published_count += 1
+            print(f"Published #{published_count}: {payload}")
+
             time.sleep(DELAY_SECONDS)
-        print(f"Total published: {published_count}")
+
+    client.disconnect()
+
+    print(f"Total published: {published_count}")
 
 
 if __name__ == "__main__":
