@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from pydantic import ValidationError
 from app.exceptions.measurement import SensorNotFoundError,InactiveSensorError,FutureMeasurementTimestampError
 from sqlalchemy.exc import SQLAlchemyError
-
+from app.metrics import mqtt_messages_received,mqtt_messages_rejected
 
 logger = logging.getLogger(__name__)
 
@@ -38,10 +38,15 @@ class MQTTConsumer:
 
     def on_message(self, _client, _userdata, message):
         
+        #Prometheus metric: Count total MQTT messages rejected by the broker/system
+        mqtt_messages_received.inc()
+        
         try:
             payload = message.payload.decode()
 
         except UnicodeDecodeError:
+            mqtt_messages_rejected.inc()
+            
             logger.warning(
                 "Invalid MQTT payload encoding"
             )
@@ -62,6 +67,9 @@ class MQTTConsumer:
             measurement = MeasurementInput(**data)
 
         except (json.JSONDecodeError, ValidationError, ValueError):
+            
+            mqtt_messages_rejected.inc()
+            
             logger.warning(
                 "Invalid MQTT measurement payload: %s",
                 payload
@@ -87,16 +95,19 @@ class MQTTConsumer:
             )
 
         except InactiveSensorError:
+            mqtt_messages_rejected.inc()
             logger.warning(
                 "MQTT measurement rejected: sensor %s is inactive",
                 measurement.sensor_id
             )
 
         except FutureMeasurementTimestampError:
+            mqtt_messages_rejected.inc()
             logger.warning(
                 "MQTT measurement rejected: timestamp is in the future"
             )
         except SQLAlchemyError:
+            mqtt_messages_rejected.inc()
             logger.exception(
                 "Database error while processing MQTT measurement"
             )

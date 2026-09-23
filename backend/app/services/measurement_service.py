@@ -19,6 +19,8 @@ from app.services.anomaly_detection.threshold_strategy import (
 )
 from app.services.alert_service import AlertService
 
+from app.metrics import measurements_stored, anomalies_detected
+
 logger = logging.getLogger(__name__)
 
 class MeasurementService:
@@ -78,8 +80,14 @@ class MeasurementService:
             measurement_data,
             is_anomalous
         )
+        
+        measurements_stored.inc()
+        
         #trigger the alert if anomaly detected
         if is_anomalous:
+            
+            anomalies_detected.inc()
+            
             self.alert_service.create_alert(
                 measurement_id=measurement.measurement_id,
                 message="Anomaly detected",

@@ -5,9 +5,11 @@ from app.api.field_router import router as field_router
 from app.api.sensor_router import router as sensor_router
 from app.api.measurement_router import router as measurement_router
 from app.api.alert_router import router as alert_router
+from app.api.metrics_router import router as metrics_router
 from app.logging_config import setup_logging
 from app.core.database import SessionLocal
 from app.mqtt.consumer import MQTTConsumer
+
 
 # Manages the application's startup and shutdown lifecycle.
 # Starts the MQTT consumer when FastAPI starts and stops it on shutdown.
@@ -40,3 +42,4 @@ app.include_router(field_router)
 app.include_router(sensor_router)
 app.include_router(measurement_router)
 app.include_router(alert_router)
+app.include_router(metrics_router)
