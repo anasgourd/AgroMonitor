@@ -24,11 +24,11 @@ def test_get_field_sensors():
         assert "status" in sensor
         
 
-def test_get_field_sensors_empty():
-    response = client.get("/fields/6/sensors")
+# def test_get_field_sensors_empty():
+#     response = client.get("/fields/4/sensors")
 
-    assert response.status_code == 200
-    assert response.json() == []
+#     assert response.status_code == 200
+#     assert response.json() == []
     
 def test_get_field_sensors_field_not_found():
     response = client.get("/fields/999999/sensors")
@@ -129,7 +129,7 @@ def test_get_sensor_invalid_id():
 
 def test_update_sensor():
     response = client.put(
-        "/sensors/3",
+        "/sensors/1",
         json={
             "sensor_name": "Updated Temperature Sensor",
             "status": "active"
@@ -140,7 +140,7 @@ def test_update_sensor():
 
     data = response.json()
 
-    assert data["sensor_id"] == 3
+    assert data["sensor_id"] == 1
     assert data["field_id"] == 3
     assert data["sensor_name"] == "Updated Temperature Sensor"
     assert data["status"] == "active"

@@ -9,6 +9,7 @@ from app.api.metrics_router import router as metrics_router
 from app.logging_config import setup_logging
 from app.core.database import SessionLocal
 from app.mqtt.consumer import MQTTConsumer
+import os
 
 
 # Manages the application's startup and shutdown lifecycle.
@@ -17,8 +18,8 @@ from app.mqtt.consumer import MQTTConsumer
 async def lifespan(app: FastAPI):
 
     consumer = MQTTConsumer(
-        broker="localhost",
-        port=1883,
+        broker=os.getenv("MQTT_BROKER", "localhost"),
+        port=int(os.getenv("MQTT_PORT", "1883")),
         session_factory=SessionLocal
     )
 

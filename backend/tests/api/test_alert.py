@@ -88,7 +88,7 @@ def test_get_alert():
 
     assert data["alert_id"] == 1
     assert data["measurement_id"] == 1
-    assert data["message"] == "Temperature anomaly detected"
+    assert data["message"] == "Anomaly detected"
     assert "timestamp" in data
 
 

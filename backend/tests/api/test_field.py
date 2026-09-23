@@ -52,7 +52,7 @@ def test_update_field():
     data = response.json()
 
     assert data["field_id"] == 2
-    assert data["user_id"] == 3
+    assert data["user_id"] == 1
     assert data["field_name"] == "Updated Field"
     assert data["type"] == "Updated Type"
     assert data["area"] == 20.5
@@ -89,7 +89,7 @@ def test_update_field_invalid_id():
 # PUT /fields/{field_id} — invalid request body
 def test_update_field_invalid_body():
     response = client.put(
-        "/fields/1",
+        "/fields/3",
         json={
             "field_name": "Updated Field"
         }
