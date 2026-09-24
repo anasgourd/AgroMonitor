@@ -1,17 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Header from "./components/Header";
 import Home from "./pages/Home";
 import FieldDashboard from "./pages/FieldDashboard";
-
-import { fields } from "./data/fields";
-
+import { getUserFields } from "./api/field";
+import { mapFieldFromApi } from "./api/fieldMapper";
 
 export default function App() {
 
   const [selectedField, setSelectedField] = useState(null);
-
-
+  const [fields, setFields] = useState([]);
+  useEffect(() => {
+    getUserFields(3)
+      .then((data) => {
+        setFields(data.map(mapFieldFromApi));
+      })
+      .catch((error) => {
+        console.error("Failed to load fields:", error);
+      });
+  }, []);
   return (
 
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
@@ -39,3 +46,4 @@ export default function App() {
 
   );
 }
+

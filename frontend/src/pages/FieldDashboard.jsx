@@ -10,11 +10,79 @@ import HistoricalAnalysis from "../components/FieldDashboard/HistoricalAnalysis"
 import FieldMap from "../components/FieldDashboard/FieldMap";
 import FieldOverview from "../components/FieldDashboard/FieldOverview";
 import FieldHeader from "../components/FieldDashboard/FieldHeader";
+import { useEffect, useState } from "react";
 
+import {
+  getFieldSensors,
+  getSensorMeasurements,
+} from "../api/field";
+import { mapSensorFromApi } from "../api/sensorMapper";
 
 // Handle the case where the requested field does not exist.
 // Display a fallback view when no field data is available.
 export default function FieldDashboard({ field, onBack }) {
+
+  // Prepare sensor data, historical data, averages, and field status for the dashboard.
+  const [sensors, setSensors] = useState([]);
+  const [measurements, setMeasurements] = useState({});
+
+  // useEffect(() => {
+  //   getFieldSensors(field.id)
+  //   .then(async (data) => {
+  //     setSensors(data);
+
+  //     const measurementResults = await Promise.all(
+  //       data.map(async (sensor) => {
+  //         const sensorMeasurements = await getSensorMeasurements(
+  //           sensor.sensor_id
+  //         );
+
+  //         return [sensor.sensor_id, sensorMeasurements];
+  //       })
+  //     );
+
+  //     setMeasurements(Object.fromEntries(measurementResults));
+  //     console.log("Sensors:", data);
+  //     console.log("Measurements:", measurementResults);
+  //   })
+  //   .catch((error) => {
+  //     console.error("Failed to load field data:", error);
+  //   });
+  // }, [field.id]);
+  useEffect(() => {
+    getFieldSensors(field.id)
+      .then(async (data) => {
+        const measurementResults = await Promise.all(
+          data.map(async (sensor) => {
+            const sensorMeasurements = await getSensorMeasurements(
+              sensor.sensor_id
+            );
+
+            return [sensor.sensor_id, sensorMeasurements];
+          })
+        );
+
+        const measurementMap = Object.fromEntries(measurementResults);
+
+        const mappedSensors = data.map((sensor) =>
+          mapSensorFromApi(
+            sensor,
+            measurementMap[sensor.sensor_id] ?? []
+          )
+        );
+
+        setSensors(mappedSensors);
+        setMeasurements(measurementMap);
+
+        console.log("Sensors:", mappedSensors);
+        console.log("Measurements:", measurementMap);
+      })
+      .catch((error) => {
+        console.error("Failed to load field data:", error);
+      });
+  }, [field.id]);
+
+
   if (!field) {
     return (
       <main className="min-h-screen bg-emerald-50 flex items-center justify-center">
@@ -33,8 +101,6 @@ export default function FieldDashboard({ field, onBack }) {
       </main>
     );
   }
-  // Prepare sensor data, historical data, averages, and field status for the dashboard.
-  const sensors = field.sensorDetails
 
   const temperatureSensors = sensors.filter(
     (sensor) => sensor.type === "Temperature"
