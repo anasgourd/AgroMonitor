@@ -10,6 +10,7 @@ from app.logging_config import setup_logging
 from app.core.database import SessionLocal
 from app.mqtt.consumer import MQTTConsumer
 import os
+from fastapi.middleware.cors import CORSMiddleware
 
 
 # Manages the application's startup and shutdown lifecycle.
@@ -34,6 +35,14 @@ app = FastAPI(
     title="AgroMonitor API",
     version="0.1.0",
     lifespan=lifespan
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 setup_logging()

@@ -4,7 +4,6 @@ from app.core.database import get_db
 from app.schemas.field import FieldResponse, FieldUpdate
 from app.services.field_service import FieldService
 from fastapi import HTTPException
-from app.schemas.sensor import SensorResponse
 from app.services.sensor_service import SensorService
 from app.schemas.sensor import SensorResponse,SensorCreate
 from app.models.sensor import Sensor
