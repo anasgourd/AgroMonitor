@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest";
 import { calculateAverage, statusStyles, } from "../utils/fieldUtils";
-import { fields } from "../data/fields";
 
 describe("calculateAverage", () => {
     it("calculates the average sensor value", () => {
@@ -42,33 +41,3 @@ describe("statusStyles", () => {
 });
 
 
-describe("fields data", () => {
-    it("contains the required properties for every field", () => {
-        fields.forEach((field) => {
-            expect(field.id).toBeDefined();
-            expect(field.name).toBeDefined();
-            expect(field.type).toBeDefined();
-            expect(field.area).toBeDefined();
-            expect(field.status).toBeDefined();
-
-            expect(field.sensorDetails).toBeDefined();
-            expect(Array.isArray(field.sensorDetails)).toBe(true);
-
-            expect(field.history).toBeDefined();
-            expect(field.history.temperature).toBeDefined();
-            expect(field.history.humidity).toBeDefined();
-        });
-    });
-});
-
-it("contains valid sensor data for every field", () => {
-  fields.forEach((field) => {
-    field.sensorDetails.forEach((sensor) => {
-      expect(sensor.id).toBeDefined();
-      expect(sensor.type).toBeDefined();
-      expect(sensor.value).toBeTypeOf("number");
-      expect(sensor.unit).toBeDefined();
-      expect(sensor.status).toBeDefined();
-    });
-  });
-});

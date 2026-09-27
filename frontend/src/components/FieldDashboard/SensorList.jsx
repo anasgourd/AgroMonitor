@@ -64,7 +64,7 @@ export default function SensorList({
                         <div className="text-right">
 
                             <p className="text-lg font-black text-gray-900">
-                                {sensor.value}
+                                {Number(sensor.value).toFixed(1)}
                                 {sensor.unit}
                             </p>
 

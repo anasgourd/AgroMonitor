@@ -1,15 +1,15 @@
 const API_BASE_URL = "http://localhost:8000";
 
 export async function getUserFields(userId) {
-    const response = await fetch(
-        `${API_BASE_URL}/users/${userId}/fields`
-    );
+  const response = await fetch(
+    `${API_BASE_URL}/users/${userId}/fields`
+  );
 
-    if (!response.ok) {
-        throw new Error("Failed to fetch fields");
-    }
+  if (!response.ok) {
+    throw new Error("Failed to fetch fields");
+  }
 
-    return response.json();
+  return response.json();
 }
 
 
@@ -46,6 +46,18 @@ export async function getSensorMeasurements(sensorId) {
 
   if (!response.ok) {
     throw new Error("Failed to fetch sensor measurements");
+  }
+
+  return response.json();
+}
+
+export async function getFieldAlerts(fieldId) {
+  const response = await fetch(
+    `${API_BASE_URL}/fields/${fieldId}/alerts`
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch field alerts");
   }
 
   return response.json();

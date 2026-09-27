@@ -1,4 +1,4 @@
-export default function FieldCard({ field, onSelect }) {
+export default function FieldCard({ field, onSelect, isMonitoring }) {
 
   const statusStyles = {
     Healthy: "bg-emerald-50 text-emerald-700 border-emerald-100",
@@ -86,35 +86,20 @@ export default function FieldCard({ field, onSelect }) {
 
         {/* SENSOR VALUES */}
 
+
         <div className="grid grid-cols-2 gap-4 my-4">
 
           <div className="bg-emerald-200 p-2.5 rounded-xl border border-gray-100">
-
-            <span className="block text-[11px] text-gray-500 font-medium">
-              Soil Moisture
-            </span>
-
-            <strong className="text-base font-bold text-gray-800">
-              {field.moisture}%
-            </strong>
-
-          </div>
-
-
-          <div className="bg-emerald-200 p-2.5 rounded-xl border border-gray-100">
-
             <span className="block text-[11px] text-gray-500 font-medium">
               Temperature
             </span>
 
-            <strong className="text-base font-bold text-gray-800">
-              {field.temperature}°C
+            <strong className="text-sm font-bold text-emerald-800">
+              {isMonitoring ? "Live monitoring" : "Not monitoring"}
             </strong>
-
           </div>
 
         </div>
-
 
         {/* BUTTON */}
 
@@ -127,6 +112,6 @@ export default function FieldCard({ field, onSelect }) {
 
       </div>
 
-    </article>
+    </article >
   );
 }

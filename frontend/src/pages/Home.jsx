@@ -1,7 +1,7 @@
 import SummaryCard from "../components/SummaryCard";
 import FieldCard from "../components/FieldCard";
 
-export default function Home({ fields, onSelectField }) {
+export default function Home({ fields, fieldAlerts, fieldSensors, onSelectField }) {
   return (
 
     <main className="min-h-screen bg-emerald-50">
@@ -45,23 +45,15 @@ export default function Home({ fields, onSelectField }) {
         <SummaryCard
           icon="📡"
           iconBackground="bg-blue-50"
-          value={fields.reduce(
-            (total, field) => total + field.sensorDetails.length,
-            0
-          )}
+          value={Object.values(fieldSensors).flat().length}
           label="Active Sensors"
         />
 
         <SummaryCard
           icon="⚠️"
           iconBackground="bg-rose-50"
-          value={
-            fields.filter(
-              field =>
-                field.status === "Alert" ||
-                field.status === "Attention"
-            ).length
-          }
+          // Count all alerts across all fields.
+          value={Object.values(fieldAlerts).flat().length}
           label="Open Alerts"
         />
 
@@ -88,15 +80,26 @@ export default function Home({ fields, onSelectField }) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-          {fields.map(field => (
+          {fields.map((field) => {
+            const alerts = fieldAlerts[field.id] ?? [];
 
-            <FieldCard
-              key={field.id}
-              field={field}
-              onSelect={onSelectField}
-            />
+            const status = alerts.length > 0 ? "Attention" : "Healthy";
 
-          ))}
+            return (
+              <FieldCard
+                key={field.id}
+                field={{
+                  ...field,
+                  status,
+                  sensors: (fieldSensors[field.id] ?? []).length,
+                }}
+                isMonitoring={(fieldSensors[field.id] ?? []).some(
+                  (sensor) => sensor.status === "active"
+                )}
+                onSelect={onSelectField}
+              />
+            )
+          })}
 
         </div>
 

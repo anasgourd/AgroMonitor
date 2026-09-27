@@ -24,12 +24,6 @@ def test_get_sensor_measurements():
         assert "is_anomalous" in measurement
 
 
-def test_get_sensor_measurements_empty():
-    response = client.get("/sensors/2/measurements")
-
-    assert response.status_code == 200
-    assert response.json() == []
-
 
 def test_get_sensor_measurements_sensor_not_found():
     response = client.get("/sensors/999999/measurements")

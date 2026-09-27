@@ -1,9 +1,9 @@
 import { Droplets, Thermometer } from "lucide-react";
 import SensorList from "./SensorList";
 
+
 export default function SensorInventory({
     temperatureSensors,
-    humiditySensors,
 }) {
     return (
         <section className="mb-8">
@@ -29,17 +29,6 @@ export default function SensorInventory({
                     sensorTextColor="text-rose-700"
                     sensorBackground="bg-rose-50"
                     sensorDescription="Temperature sensor"
-                />
-
-                <SensorList
-                    title="Soil Humidity"
-                    sensors={humiditySensors}
-                    icon={<Droplets size={21} className="text-emerald-700" />}
-                    iconBackground="bg-emerald-100"
-                    sensorLetter="H"
-                    sensorTextColor="text-emerald-700"
-                    sensorBackground="bg-emerald-50"
-                    sensorDescription="Humidity sensor"
                 />
 
             </div>

@@ -1,4 +1,4 @@
-import { Droplets, Thermometer } from "lucide-react";
+import { Thermometer } from "lucide-react";
 import HistoryCard from "./HistoryCard";
 
 export default function HistoricalAnalysis({ history }) {
@@ -29,16 +29,6 @@ export default function HistoricalAnalysis({ history }) {
                     unit="°C"
                     icon={<Thermometer size={19} className="text-rose-700" />}
                     iconBackground="bg-rose-100"
-                />
-
-                <HistoryCard
-                    title="Humidity history"
-                    description="Average across humidity sensors"
-                    data={history.humidity}
-                    color="#047857"
-                    unit="%"
-                    icon={<Droplets size={19} className="text-emerald-700" />}
-                    iconBackground="bg-emerald-100"
                 />
 
             </div>

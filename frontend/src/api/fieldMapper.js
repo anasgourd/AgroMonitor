@@ -4,11 +4,5 @@ export function mapFieldFromApi(field) {
     name: field.field_name,
     type: field.type,
     area: `${field.area} ha`,
-    sensorDetails: [],
-    history: {
-      temperature: [],
-      humidity: [],
-    },
-    status: "Healthy",
   };
 }

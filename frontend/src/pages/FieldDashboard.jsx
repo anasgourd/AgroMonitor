@@ -15,8 +15,11 @@ import { useEffect, useState } from "react";
 import {
   getFieldSensors,
   getSensorMeasurements,
+  getFieldAlerts,
 } from "../api/field";
 import { mapSensorFromApi } from "../api/sensorMapper";
+
+
 
 // Handle the case where the requested field does not exist.
 // Display a fallback view when no field data is available.
@@ -25,30 +28,8 @@ export default function FieldDashboard({ field, onBack }) {
   // Prepare sensor data, historical data, averages, and field status for the dashboard.
   const [sensors, setSensors] = useState([]);
   const [measurements, setMeasurements] = useState({});
+  const [alerts, setAlerts] = useState([]);
 
-  // useEffect(() => {
-  //   getFieldSensors(field.id)
-  //   .then(async (data) => {
-  //     setSensors(data);
-
-  //     const measurementResults = await Promise.all(
-  //       data.map(async (sensor) => {
-  //         const sensorMeasurements = await getSensorMeasurements(
-  //           sensor.sensor_id
-  //         );
-
-  //         return [sensor.sensor_id, sensorMeasurements];
-  //       })
-  //     );
-
-  //     setMeasurements(Object.fromEntries(measurementResults));
-  //     console.log("Sensors:", data);
-  //     console.log("Measurements:", measurementResults);
-  //   })
-  //   .catch((error) => {
-  //     console.error("Failed to load field data:", error);
-  //   });
-  // }, [field.id]);
   useEffect(() => {
     getFieldSensors(field.id)
       .then(async (data) => {
@@ -73,9 +54,9 @@ export default function FieldDashboard({ field, onBack }) {
 
         setSensors(mappedSensors);
         setMeasurements(measurementMap);
+        const fieldAlerts = await getFieldAlerts(field.id);
+        setAlerts(fieldAlerts);
 
-        console.log("Sensors:", mappedSensors);
-        console.log("Measurements:", measurementMap);
       })
       .catch((error) => {
         console.error("Failed to load field data:", error);
@@ -106,17 +87,30 @@ export default function FieldDashboard({ field, onBack }) {
     (sensor) => sensor.type === "Temperature"
   );
 
-  const humiditySensors = sensors.filter(
-    (sensor) => sensor.type === "Humidity"
-  );
+  const temperatureHistory = Object.values(measurements)
+    .flat()
+    .filter((measurement) => measurement.unit === "C")
+    .map((measurement) => ({
+      value: measurement.value,
+      time: new Date(measurement.timestamp).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    }));
 
-  const history = field.history
+  const history = {
+    temperature: temperatureHistory,
+    humidity: [],
+  };
+
 
   const averageTemperature = calculateAverage(temperatureSensors);
-  const averageHumidity = calculateAverage(humiditySensors);
+
 
   const currentStatus =
-    statusStyles[field.status] || statusStyles.Healthy;
+    alerts.length > 0
+      ? statusStyles.Attention
+      : statusStyles.Healthy;
 
 
   // Render the field dashboard with the prepared data.
@@ -128,7 +122,7 @@ export default function FieldDashboard({ field, onBack }) {
 
         <FieldHeader
           name={field.name}
-          status={field.status}
+          status={alerts.length > 0 ? "Attention" : "Healthy"}
           statusStyle={currentStatus}
           onBack={onBack}
         />
@@ -136,7 +130,6 @@ export default function FieldDashboard({ field, onBack }) {
         {/* LIVE SENSOR SUMMARY */}
 
         <SensorSummary
-          averageHumidity={averageHumidity}
           averageTemperature={averageTemperature}
           sensorCount={sensors.length}
         />
@@ -145,7 +138,6 @@ export default function FieldDashboard({ field, onBack }) {
 
         <SensorInventory
           temperatureSensors={temperatureSensors}
-          humiditySensors={humiditySensors}
         />
 
         {/* HISTORICAL ANALYSIS */}
@@ -162,6 +154,7 @@ export default function FieldDashboard({ field, onBack }) {
             type={field.type}
             status={field.status}
             message={currentStatus.message}
+            alerts={alerts}
           />
 
         </section>
