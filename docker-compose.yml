@@ -15,6 +15,9 @@ services:
       DATABASE_URL: postgresql+psycopg://postgres:${POSTGRES_PASSWORD}@postgres:5432/agromonitor
       MQTT_BROKER: mqtt
       MQTT_PORT: 1883
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_ALGORITHM: ${JWT_ALGORITHM}
+      JWT_EXPIRE_MINUTES: ${JWT_EXPIRE_MINUTES}
     ports:
       - "8000:8000"
     depends_on:
