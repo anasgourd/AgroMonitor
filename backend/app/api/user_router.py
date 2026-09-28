@@ -8,6 +8,8 @@ from app.services.field_service import FieldService
 from fastapi import HTTPException
 from app.schemas.alert import AlertResponse
 from app.services.alert_service import AlertService
+from app.core.security import get_current_user_id
+
 
 router = APIRouter(
     prefix="/users",
@@ -23,6 +25,23 @@ def create_user(
     service = UserService(db)
     return service.create_user(user_data)
 
+#for jwt check
+@router.get("/me", response_model=UserResponse)
+def get_current_user(
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    service = UserService(db)
+
+    user = service.get_user(user_id)
+
+    if user is None:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found",
+        )
+
+    return user
 
 @router.get("/{user_id}", response_model=UserResponse)
 def get_user(
@@ -138,3 +157,4 @@ def get_user_alerts(
         )
 
     return alert_service.get_user_alerts(user_id)
+
