@@ -43,6 +43,16 @@ def get_current_user(
 
     return user
 
+@router.get("/me/fields", response_model=list[FieldResponse])
+def get_current_user_fields(
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    service = FieldService(db)
+
+    return service.get_user_fields(user_id)
+
+
 @router.get("/{user_id}", response_model=UserResponse)
 def get_user(
     user_id: int,
