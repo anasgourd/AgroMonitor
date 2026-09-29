@@ -1,4 +1,6 @@
-const API_BASE_URL = "http://localhost:8000";
+
+import { apiFetch } from "./apiFetch";
+
 
 export async function getUserFields(userId) {
   const response = await fetch(
@@ -14,9 +16,7 @@ export async function getUserFields(userId) {
 
 
 export async function getField(fieldId) {
-  const response = await fetch(
-    `${API_BASE_URL}/fields/${fieldId}`
-  );
+  const response = await apiFetch(`/fields/${fieldId}`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch field");
@@ -27,9 +27,7 @@ export async function getField(fieldId) {
 
 
 export async function getFieldSensors(fieldId) {
-  const response = await fetch(
-    `${API_BASE_URL}/fields/${fieldId}/sensors`
-  );
+  const response = await apiFetch(`/fields/${fieldId}/sensors`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch field sensors");
@@ -38,10 +36,9 @@ export async function getFieldSensors(fieldId) {
   return response.json();
 }
 
-
 export async function getSensorMeasurements(sensorId) {
-  const response = await fetch(
-    `${API_BASE_URL}/sensors/${sensorId}/measurements`
+  const response = await apiFetch(
+    `/sensors/${sensorId}/measurements`
   );
 
   if (!response.ok) {
@@ -52,8 +49,8 @@ export async function getSensorMeasurements(sensorId) {
 }
 
 export async function getFieldAlerts(fieldId) {
-  const response = await fetch(
-    `${API_BASE_URL}/fields/${fieldId}/alerts`
+  const response = await apiFetch(
+    `/fields/${fieldId}/alerts`
   );
 
   if (!response.ok) {

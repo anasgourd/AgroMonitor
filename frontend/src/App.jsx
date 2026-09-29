@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Header from "./components/Header";
 import Home from "./pages/Home";
 import FieldDashboard from "./pages/FieldDashboard";
-import { getUserFields, getFieldAlerts, getFieldSensors } from "./api/field";
+import { getFieldAlerts, getFieldSensors } from "./api/field";
 import { mapFieldFromApi } from "./api/fieldMapper";
 import Login from "./pages/Login";
 import {
@@ -41,6 +41,9 @@ export default function App() {
 
 
   useEffect(() => {
+    if (!isLoggedIn) {
+      return;
+    }
     getCurrentUserFields()
       .then(async (data) => {
         setFields(data.map(mapFieldFromApi));
@@ -69,7 +72,7 @@ export default function App() {
       .catch((error) => {
         console.error("Failed to load fields:", error);
       });
-  }, []);
+  }, [isLoggedIn]);
   // Show login page until the user is authenticated.
   if (!isLoggedIn) {
     return <Login onLogin={handleLogin} />;
