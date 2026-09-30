@@ -1,7 +1,9 @@
 import SummaryCard from "../components/SummaryCard";
 import FieldCard from "../components/FieldCard";
 
-export default function Home({ fields, fieldAlerts, fieldSensors, onSelectField }) {
+export default function Home({ fields, fieldAlerts, fieldSensors, onSelectField, onAddField, }) {
+
+
   return (
 
     <main className="min-h-screen bg-emerald-50">
@@ -24,7 +26,10 @@ export default function Home({ fields, fieldAlerts, fieldSensors, onSelectField 
         </div>
 
 
-        <button className="self-start sm:self-auto bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-100 transition-all text-sm">
+        <button
+          onClick={onAddField}
+          className="self-start sm:self-auto bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-100 transition-all text-sm"
+        >
           + Add Field
         </button>
 

@@ -121,15 +121,16 @@ def get_user_fields(user_id: int, db: Session = Depends(get_db)):
  
     return fields
 
+
+# user_id is taken from the path, while field_data is received in the request body.
 @router.post(
-    "/{user_id}/fields",
+    "/me/fields",
     response_model=FieldResponse,
     status_code=201
 )
-# user_id is taken from the path, while field_data is received in the request body.
-def create_field(
-    user_id: int,
+def create_current_user_field(
     field_data: FieldCreate,
+    user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
 ):
     user_service = UserService(db)
@@ -145,6 +146,7 @@ def create_field(
     field_service = FieldService(db)
 
     return field_service.create_field(user_id, field_data)
+
 
 @router.get(
     "/{user_id}/alerts",

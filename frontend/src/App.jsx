@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 import Header from "./components/Header";
 import Home from "./pages/Home";
 import FieldDashboard from "./pages/FieldDashboard";
+import AddField from "./pages/AddField";
 import { getFieldAlerts, getFieldSensors } from "./api/field";
 import { mapFieldFromApi } from "./api/fieldMapper";
 import Login from "./pages/Login";
+
 import {
   login,
   getCurrentUser,
@@ -14,11 +16,21 @@ import {
 export default function App() {
 
   const [selectedField, setSelectedField] = useState(null);
+  const [showAddField, setShowAddField] = useState(false);
   const [fields, setFields] = useState([]);
   const [fieldAlerts, setFieldAlerts] = useState({});
   const [fieldSensors, setFieldSensors] = useState({});
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  function handleFieldCreated(newField) {
+    setFields((currentFields) => [
+      ...currentFields,
+      mapFieldFromApi(newField),
+    ]);
+
+    setShowAddField(false);
+  }
 
   // Handle login and update authentication state.
 
@@ -85,21 +97,23 @@ export default function App() {
 
 
       {selectedField ? (
-
         <FieldDashboard
           field={selectedField}
           onBack={() => setSelectedField(null)}
         />
-
+      ) : showAddField ? (
+        <AddField
+          onBack={() => setShowAddField(false)}
+          onCreated={handleFieldCreated}
+        />
       ) : (
-
         <Home
           fields={fields}
           fieldAlerts={fieldAlerts}
           fieldSensors={fieldSensors}
           onSelectField={setSelectedField}
+          onAddField={() => setShowAddField(true)}
         />
-
       )}
 
     </div>

@@ -59,3 +59,19 @@ export async function getFieldAlerts(fieldId) {
 
   return response.json();
 }
+
+export async function createCurrentUserField(fieldData) {
+  const response = await apiFetch("/users/me/fields", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(fieldData),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create field");
+  }
+
+  return response.json();
+}
