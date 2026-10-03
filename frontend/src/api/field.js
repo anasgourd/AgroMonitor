@@ -75,3 +75,20 @@ export async function createCurrentUserField(fieldData) {
 
   return response.json();
 }
+
+
+export async function updateField(fieldId, fieldData) {
+  const response = await apiFetch(`/fields/${fieldId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(fieldData),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update field");
+  }
+
+  return response.json();
+}

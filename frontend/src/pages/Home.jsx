@@ -1,8 +1,15 @@
 import SummaryCard from "../components/SummaryCard";
 import FieldCard from "../components/FieldCard";
 
-export default function Home({ fields, fieldAlerts, fieldSensors, onSelectField, onAddField, }) {
 
+export default function Home({
+  fields,
+  fieldAlerts,
+  fieldSensors,
+  onSelectField,
+  onAddField,
+  onEdit,
+}) {
 
   return (
 
@@ -102,6 +109,9 @@ export default function Home({ fields, fieldAlerts, fieldSensors, onSelectField,
                   (sensor) => sensor.status === "active"
                 )}
                 onSelect={onSelectField}
+
+                onEdit={onEdit}
+
               />
             )
           })}

@@ -4,15 +4,17 @@ import Header from "./components/Header";
 import Home from "./pages/Home";
 import FieldDashboard from "./pages/FieldDashboard";
 import AddField from "./pages/AddField";
+import EditField from "./pages/EditField";
 import { getFieldAlerts, getFieldSensors } from "./api/field";
 import { mapFieldFromApi } from "./api/fieldMapper";
 import Login from "./pages/Login";
-
 import {
   login,
   getCurrentUser,
   getCurrentUserFields,
 } from "./api/auth";
+
+
 export default function App() {
 
   const [selectedField, setSelectedField] = useState(null);
@@ -23,6 +25,8 @@ export default function App() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const [fieldToEdit, setFieldToEdit] = useState(null);
+
   function handleFieldCreated(newField) {
     setFields((currentFields) => [
       ...currentFields,
@@ -32,6 +36,21 @@ export default function App() {
     setShowAddField(false);
   }
 
+  function handleEditField(field) {
+    setFieldToEdit(field);
+  }
+
+  function handleFieldUpdated(updatedField) {
+    setFields((currentFields) =>
+      currentFields.map((field) =>
+        field.id === updatedField.field_id
+          ? mapFieldFromApi(updatedField)
+          : field
+      )
+    );
+
+    setFieldToEdit(null);
+  }
   // Handle login and update authentication state.
 
   async function handleLogin(username, password) {
@@ -106,6 +125,12 @@ export default function App() {
           onBack={() => setShowAddField(false)}
           onCreated={handleFieldCreated}
         />
+      ) : fieldToEdit ? (
+        <EditField
+          field={fieldToEdit}
+          onBack={() => setFieldToEdit(null)}
+          onUpdated={handleFieldUpdated}
+        />
       ) : (
         <Home
           fields={fields}
@@ -113,6 +138,7 @@ export default function App() {
           fieldSensors={fieldSensors}
           onSelectField={setSelectedField}
           onAddField={() => setShowAddField(true)}
+          onEdit={handleEditField}
         />
       )}
 

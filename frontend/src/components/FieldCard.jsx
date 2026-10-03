@@ -1,4 +1,4 @@
-export default function FieldCard({ field, onSelect, isMonitoring }) {
+export default function FieldCard({ field, onSelect,onEdit, isMonitoring }) {
 
   const statusStyles = {
     Healthy: "bg-emerald-50 text-emerald-700 border-emerald-100",
@@ -87,9 +87,9 @@ export default function FieldCard({ field, onSelect, isMonitoring }) {
         {/* SENSOR VALUES */}
 
 
-        <div className="grid grid-cols-2 gap-4 my-4">
+        <div className="flex items-center gap-3 my-4">
 
-          <div className="bg-emerald-200 p-2.5 rounded-xl border border-gray-100">
+          <div className="bg-emerald-200 p-2.5 rounded-xl border border-gray-100 flex-1">
             <span className="block text-[11px] text-gray-500 font-medium">
               Temperature
             </span>
@@ -97,6 +97,22 @@ export default function FieldCard({ field, onSelect, isMonitoring }) {
             <strong className="text-sm font-bold text-emerald-800">
               {isMonitoring ? "Live monitoring" : "Not monitoring"}
             </strong>
+          </div>
+
+          <div className="flex items-center gap-1.5">
+
+            <button
+              onClick={(event) => {
+                event.stopPropagation();
+                onEdit(field);
+              }}
+              className="w-7 h-7 rounded-lg hover:bg-emerald-100 flex items-center justify-center text-sm transition-colors"
+              title="Edit field"
+            >
+              ✏️
+            </button>
+
+
           </div>
 
         </div>
