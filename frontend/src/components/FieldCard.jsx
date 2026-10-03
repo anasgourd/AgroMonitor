@@ -1,4 +1,4 @@
-export default function FieldCard({ field, onSelect,onEdit, isMonitoring }) {
+export default function FieldCard({ field, onSelect, onEdit, onDelete, isMonitoring }) {
 
   const statusStyles = {
     Healthy: "bg-emerald-50 text-emerald-700 border-emerald-100",
@@ -110,6 +110,17 @@ export default function FieldCard({ field, onSelect,onEdit, isMonitoring }) {
               title="Edit field"
             >
               ✏️
+            </button>
+
+            <button
+              onClick={(event) => {
+                event.stopPropagation();
+                onDelete(field);
+              }}
+              className="w-7 h-7 rounded-lg hover:bg-rose-100 flex items-center justify-center text-sm transition-colors"
+              title="Delete field"
+            >
+              ✕
             </button>
 
 

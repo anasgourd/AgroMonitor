@@ -9,6 +9,7 @@ export default function Home({
   onSelectField,
   onAddField,
   onEdit,
+  onDelete,
 }) {
 
   return (
@@ -111,6 +112,7 @@ export default function Home({
                 onSelect={onSelectField}
 
                 onEdit={onEdit}
+                onDelete={onDelete}
 
               />
             )

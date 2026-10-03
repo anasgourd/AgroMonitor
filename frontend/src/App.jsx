@@ -5,6 +5,9 @@ import Home from "./pages/Home";
 import FieldDashboard from "./pages/FieldDashboard";
 import AddField from "./pages/AddField";
 import EditField from "./pages/EditField";
+//1
+import { deleteField } from "./api/field";
+import DeleteField from "./pages/DeleteField";
 import { getFieldAlerts, getFieldSensors } from "./api/field";
 import { mapFieldFromApi } from "./api/fieldMapper";
 import Login from "./pages/Login";
@@ -26,6 +29,9 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const [fieldToEdit, setFieldToEdit] = useState(null);
+
+  //2
+  const [fieldToDelete, setFieldToDelete] = useState(null);
 
   function handleFieldCreated(newField) {
     setFields((currentFields) => [
@@ -51,6 +57,19 @@ export default function App() {
 
     setFieldToEdit(null);
   }
+
+  //3
+  async function handleFieldDeleted(fieldId) {
+    await deleteField(fieldId);
+
+    setFields((currentFields) =>
+      currentFields.filter((field) => field.id !== fieldId)
+    );
+
+    setFieldToDelete(null);
+  }
+
+
   // Handle login and update authentication state.
 
   async function handleLogin(username, password) {
@@ -139,6 +158,15 @@ export default function App() {
           onSelectField={setSelectedField}
           onAddField={() => setShowAddField(true)}
           onEdit={handleEditField}
+          onDelete={setFieldToDelete}
+        />
+      )}
+
+      {fieldToDelete && (
+        <DeleteField
+          field={fieldToDelete}
+          onCancel={() => setFieldToDelete(null)}
+          onDeleted={handleFieldDeleted}
         />
       )}
 
