@@ -18,10 +18,14 @@ export const statusStyles = {
 };
 
 export function calculateAverage(sensors) {
-    if (!sensors.length) return 0;
+    const activeSensors = sensors.filter(
+        (sensor) => sensor.status === "active"
+    );
+
+    if (!activeSensors.length) return 0;
 
     return (
-        sensors.reduce((sum, sensor) => sum + sensor.value, 0) /
-        sensors.length
+        activeSensors.reduce((sum, sensor) => sum + sensor.value, 0) /
+        activeSensors.length
     );
 }

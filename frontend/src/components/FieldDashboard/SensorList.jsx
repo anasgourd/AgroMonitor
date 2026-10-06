@@ -51,7 +51,7 @@ export default function SensorList({
 
                             <div>
                                 <p className="text-sm font-bold text-gray-900">
-                                    {sensor.id}
+                                    {sensor.name}
                                 </p>
 
                                 <p className="text-xs text-gray-500">

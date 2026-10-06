@@ -12,18 +12,21 @@ import FieldOverview from "../components/FieldDashboard/FieldOverview";
 import FieldHeader from "../components/FieldDashboard/FieldHeader";
 import { useEffect, useState } from "react";
 
+
 import {
   getFieldSensors,
   getSensorMeasurements,
   getFieldAlerts,
 } from "../api/field";
+
+
 import { mapSensorFromApi } from "../api/sensorMapper";
 
 
 
 // Handle the case where the requested field does not exist.
 // Display a fallback view when no field data is available.
-export default function FieldDashboard({ field, onBack }) {
+export default function FieldDashboard({ field, onBack, onAddSensor }) {
 
   // Prepare sensor data, historical data, averages, and field status for the dashboard.
   const [sensors, setSensors] = useState([]);
@@ -133,6 +136,14 @@ export default function FieldDashboard({ field, onBack }) {
           averageTemperature={averageTemperature}
           sensorCount={sensors.length}
         />
+
+        <button
+          onClick={() => onAddSensor(field)}
+          className="mb-4 px-4 py-2 rounded-xl bg-emerald-700 text-white font-semibold"
+        >
+          Add Sensor
+        </button>
+
 
         {/* SENSOR INVENTORY */}
 

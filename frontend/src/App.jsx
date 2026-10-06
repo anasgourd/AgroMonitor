@@ -5,7 +5,6 @@ import Home from "./pages/Home";
 import FieldDashboard from "./pages/FieldDashboard";
 import AddField from "./pages/AddField";
 import EditField from "./pages/EditField";
-//1
 import { deleteField } from "./api/field";
 import DeleteField from "./pages/DeleteField";
 import { getFieldAlerts, getFieldSensors } from "./api/field";
@@ -17,6 +16,7 @@ import {
   getCurrentUserFields,
 } from "./api/auth";
 
+import AddSensor from "./pages/AddSensor";
 
 export default function App() {
 
@@ -30,8 +30,12 @@ export default function App() {
 
   const [fieldToEdit, setFieldToEdit] = useState(null);
 
-  //2
+
   const [fieldToDelete, setFieldToDelete] = useState(null);
+
+  const [fieldToAddSensor, setFieldToAddSensor] = useState(null);
+
+  const [dataVersion, setDataVersion] = useState(0);
 
   function handleFieldCreated(newField) {
     setFields((currentFields) => [
@@ -46,6 +50,11 @@ export default function App() {
     setFieldToEdit(field);
   }
 
+  function handleAddSensor(field) {
+    setSelectedField(null);
+    setFieldToAddSensor(field);
+  }
+
   function handleFieldUpdated(updatedField) {
     setFields((currentFields) =>
       currentFields.map((field) =>
@@ -58,7 +67,6 @@ export default function App() {
     setFieldToEdit(null);
   }
 
-  //3
   async function handleFieldDeleted(fieldId) {
     await deleteField(fieldId);
 
@@ -122,7 +130,7 @@ export default function App() {
       .catch((error) => {
         console.error("Failed to load fields:", error);
       });
-  }, [isLoggedIn]);
+  }, [isLoggedIn, dataVersion]);
   // Show login page until the user is authenticated.
   if (!isLoggedIn) {
     return <Login onLogin={handleLogin} />;
@@ -138,6 +146,7 @@ export default function App() {
         <FieldDashboard
           field={selectedField}
           onBack={() => setSelectedField(null)}
+          onAddSensor={handleAddSensor}
         />
       ) : showAddField ? (
         <AddField
@@ -149,6 +158,16 @@ export default function App() {
           field={fieldToEdit}
           onBack={() => setFieldToEdit(null)}
           onUpdated={handleFieldUpdated}
+        />
+      ) : fieldToAddSensor ? (
+        <AddSensor
+          field={fieldToAddSensor}
+          onBack={() => setFieldToAddSensor(null)}
+          onCreated={() => {
+            setDataVersion((version) => version + 1);
+            setFieldToAddSensor(null);
+            setSelectedField(fieldToAddSensor);
+          }}
         />
       ) : (
         <Home
