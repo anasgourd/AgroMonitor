@@ -9,6 +9,7 @@ export default function SensorList({
     sensorTextColor,
     sensorDescription,
     onEdit,
+    onDelete,
 }) {
     return (
         <div className="bg-white/75 rounded-3xl border border-emerald-100 shadow-sm p-5">
@@ -74,14 +75,24 @@ export default function SensorList({
                             </p>
 
                         </div>
+                        {/* Τα δύο κουμπιά μαζί */}
+                        <div className="ml-4 flex gap-1">
+                            <button
+                                type="button"
+                                onClick={() => onEdit(sensor)}
+                                className="rounded-lg border border-emerald-200 px-3 py-2 text-sm font-medium text-emerald-800 hover:bg-emerald-100"
+                            >
+                                Edit
+                            </button>
 
-                        <button
-                            type="button"
-                            onClick={() => onEdit(sensor)}
-                            className="ml-4 rounded-lg border border-emerald-200 px-3 py-2 text-sm font-medium text-emerald-800 hover:bg-emerald-100"
-                        >
-                            Edit
-                        </button>
+                            <button
+                                type="button"
+                                onClick={() => onDelete(sensor)}
+                                className="rounded-lg border border-rose-200 px-3 py-2 text-sm font-medium text-rose-700 hover:bg-rose-100"
+                            >
+                                Delete
+                            </button>
+                        </div>
 
                     </div>
 

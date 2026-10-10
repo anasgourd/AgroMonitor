@@ -18,6 +18,7 @@ import {
 
 import AddSensor from "./pages/AddSensor";
 import EditSensor from "./pages/EditSensor";
+import DeleteSensor from "./pages/DeleteSensor";
 
 export default function App() {
 
@@ -39,8 +40,11 @@ export default function App() {
   //which sensor you edit
   const [sensorToEdit, setSensorToEdit] = useState(null);
 
-  // in withch field you are
+  // in witch field you are
   const [fieldForSensorEdit, setFieldForSensorEdit] = useState(null);
+
+  const [sensorToDelete, setSensorToDelete] = useState(null);
+  const [fieldForSensorDelete, setFieldForSensorDelete] = useState(null);
 
   const [dataVersion, setDataVersion] = useState(0);
 
@@ -82,6 +86,13 @@ export default function App() {
     );
 
     setFieldToDelete(null);
+  }
+
+
+  function handleDeleteSensor(sensor) {
+    setFieldForSensorDelete(selectedField);
+    setSelectedField(null);
+    setSensorToDelete(sensor);
   }
 
 
@@ -157,6 +168,7 @@ export default function App() {
           onBack={() => setSelectedField(null)}
           onAddSensor={handleAddSensor}
           onEditSensor={handleEditSensor}
+          onDeleteSensor={handleDeleteSensor}
         />
       ) : showAddField ? (
         <AddField
@@ -194,6 +206,21 @@ export default function App() {
             setSelectedField(fieldForSensorEdit);
             setFieldForSensorEdit(null);
             //dataversion increases so App reloads the data
+            setDataVersion((version) => version + 1);
+          }}
+        />
+      ) : sensorToDelete ? (
+        <DeleteSensor
+          sensor={sensorToDelete}
+          onBack={() => {
+            setSensorToDelete(null);
+            setSelectedField(fieldForSensorDelete);
+            setFieldForSensorDelete(null);
+          }}
+          onDeleted={() => {
+            setSensorToDelete(null);
+            setSelectedField(fieldForSensorDelete);
+            setFieldForSensorDelete(null);
             setDataVersion((version) => version + 1);
           }}
         />
