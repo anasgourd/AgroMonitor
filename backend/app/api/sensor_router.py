@@ -59,6 +59,7 @@ def update_sensor(
 
     return sensor
 
+
 @router.delete(
     "/{sensor_id}",
     status_code=204
@@ -70,12 +71,18 @@ def delete_sensor(
 
     service = SensorService(db)
 
-    deleted = service.delete_sensor(sensor_id)
+    result = service.delete_sensor(sensor_id)
 
-    if not deleted:
+    if result == "not_found":
         raise HTTPException(
             status_code=404,
             detail="Sensor not found"
+        )
+
+    if result == "has_measurements":
+        raise HTTPException(
+            status_code=409,
+            detail="Cannot delete sensor because it has recorded measurements"
         )
         
 # These endpoints are nested under a sensor (/sensor/{measurement_id}/...)

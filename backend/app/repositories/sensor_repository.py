@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.sensor import Sensor
 from app.models.sensor import Sensor
 from app.schemas.sensor import SensorCreate,SensorUpdate
-
+from app.models.measurement import Measurement
 
 class SensorRepository:
     def __init__(self, db: Session):
@@ -81,3 +81,10 @@ class SensorRepository:
         self.db.commit()
 
         return True
+    
+    def has_measurements(self, sensor_id: int) -> bool:
+        return (
+            self.db.query(Measurement)
+            .filter(Measurement.sensor_id == sensor_id)
+            .first()
+        ) is not None

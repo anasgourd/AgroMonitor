@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.models.field import Field
 from app.schemas.field import FieldCreate
 
+from app.models.sensor import Sensor
 
 class FieldRepository:
 
@@ -64,3 +65,10 @@ class FieldRepository:
         self.db.commit()
 
         return True
+    
+    def has_sensors(self, field_id: int) -> bool:
+        return (
+            self.db.query(Sensor)
+            .filter(Sensor.field_id == field_id)
+            .first()
+        ) is not None

@@ -59,12 +59,18 @@ def delete_field(
 ):
     service = FieldService(db)
 
-    deleted = service.delete_field(field_id)
+    result = service.delete_field(field_id)
 
-    if not deleted:
+    if result == "not_found":
         raise HTTPException(
             status_code=404,
             detail="Field not found"
+        )
+
+    if result == "has_sensors":
+        raise HTTPException(
+            status_code=409,
+            detail="Cannot delete field because it has associated sensors"
         )
  
 # These endpoints are nested under a field (/field/{sensor_id}/...)

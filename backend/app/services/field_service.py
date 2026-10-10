@@ -25,5 +25,17 @@ class FieldService:
         return self.repository.get_by_id(field_id)
     def update_field(self, field_id: int, field_data):
         return self.repository.update(field_id, field_data)
-    def delete_field(self, field_id: int):
-        return self.repository.delete(field_id)
+
+    def delete_field(self, field_id: int) -> str:
+        field = self.repository.get_by_id(field_id)
+
+        if field is None:
+            return "not_found"
+
+        if self.repository.has_sensors(field_id):
+            return "has_sensors"
+
+        self.repository.delete(field_id)
+
+        return "deleted"
+    

@@ -37,5 +37,15 @@ class SensorService:
             sensor_data
         )
         
-    def delete_sensor(self,sensor_id: int) -> bool:
-        return self.repository.delete(sensor_id)
+    def delete_sensor(self, sensor_id: int) -> str:
+        sensor = self.repository.get_by_id(sensor_id)
+
+        if sensor is None:
+            return "not_found"
+
+        if self.repository.has_measurements(sensor_id):
+            return "has_measurements"
+
+        self.repository.delete(sensor_id)
+
+        return "deleted"

@@ -94,12 +94,15 @@ export async function updateField(fieldId, fieldData) {
 }
 
 
+
 export async function deleteField(fieldId) {
   const response = await apiFetch(`/fields/${fieldId}`, {
     method: "DELETE",
   });
 
   if (!response.ok) {
-    throw new Error("Failed to delete field");
+    const error = new Error("Failed to delete field");
+    error.status = response.status;
+    throw error;
   }
 }
