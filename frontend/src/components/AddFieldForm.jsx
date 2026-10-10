@@ -20,7 +20,7 @@ export default function AddFieldForm({ onCancel, onCreated }) {
             onCreated(newField);
         } catch (error) {
             console.error("Failed to create field:", error);
-        }
+        }κ
     }
 
     return (

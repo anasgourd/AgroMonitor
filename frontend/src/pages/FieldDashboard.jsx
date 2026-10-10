@@ -26,7 +26,7 @@ import { mapSensorFromApi } from "../api/sensorMapper";
 
 // Handle the case where the requested field does not exist.
 // Display a fallback view when no field data is available.
-export default function FieldDashboard({ field, onBack, onAddSensor }) {
+export default function FieldDashboard({ field, onBack, onAddSensor, onEditSensor }) {
 
   // Prepare sensor data, historical data, averages, and field status for the dashboard.
   const [sensors, setSensors] = useState([]);
@@ -149,6 +149,7 @@ export default function FieldDashboard({ field, onBack, onAddSensor }) {
 
         <SensorInventory
           temperatureSensors={temperatureSensors}
+          onEditSensor={onEditSensor}
         />
 
         {/* HISTORICAL ANALYSIS */}

@@ -8,6 +8,7 @@ export default function SensorList({
     sensorBackground,
     sensorTextColor,
     sensorDescription,
+    onEdit,
 }) {
     return (
         <div className="bg-white/75 rounded-3xl border border-emerald-100 shadow-sm p-5">
@@ -73,6 +74,14 @@ export default function SensorList({
                             </p>
 
                         </div>
+
+                        <button
+                            type="button"
+                            onClick={() => onEdit(sensor)}
+                            className="ml-4 rounded-lg border border-emerald-200 px-3 py-2 text-sm font-medium text-emerald-800 hover:bg-emerald-100"
+                        >
+                            Edit
+                        </button>
 
                     </div>
 

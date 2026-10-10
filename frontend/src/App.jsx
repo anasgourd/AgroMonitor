@@ -17,6 +17,7 @@ import {
 } from "./api/auth";
 
 import AddSensor from "./pages/AddSensor";
+import EditSensor from "./pages/EditSensor";
 
 export default function App() {
 
@@ -34,6 +35,12 @@ export default function App() {
   const [fieldToDelete, setFieldToDelete] = useState(null);
 
   const [fieldToAddSensor, setFieldToAddSensor] = useState(null);
+
+  //which sensor you edit
+  const [sensorToEdit, setSensorToEdit] = useState(null);
+
+  // in withch field you are
+  const [fieldForSensorEdit, setFieldForSensorEdit] = useState(null);
 
   const [dataVersion, setDataVersion] = useState(0);
 
@@ -83,13 +90,10 @@ export default function App() {
   async function handleLogin(username, password) {
     try {
       const data = await login(username, password);
-
-      console.log("Login successful:", data);
       // Store JWT so it can be used for authenticated API requests.
       localStorage.setItem("access_token", data.access_token);
 
       const user = await getCurrentUser();
-      console.log("Current user:", user)
 
       setIsLoggedIn(true);
     } catch (error) {
@@ -97,6 +101,11 @@ export default function App() {
     }
   }
 
+  function handleEditSensor(sensor) {
+    setFieldForSensorEdit(selectedField);
+    setSelectedField(null);
+    setSensorToEdit(sensor);
+  }
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -147,6 +156,7 @@ export default function App() {
           field={selectedField}
           onBack={() => setSelectedField(null)}
           onAddSensor={handleAddSensor}
+          onEditSensor={handleEditSensor}
         />
       ) : showAddField ? (
         <AddField
@@ -167,6 +177,24 @@ export default function App() {
             setDataVersion((version) => version + 1);
             setFieldToAddSensor(null);
             setSelectedField(fieldToAddSensor);
+          }}
+        />
+      ) : sensorToEdit ? (
+        <EditSensor
+          sensor={sensorToEdit}
+          onBack={() => {
+            setSensorToEdit(null);
+            setSelectedField(fieldForSensorEdit);
+            setFieldForSensorEdit(null);
+          }}
+          onUpdated={() => {
+            //edit sensor page closes
+            setSensorToEdit(null);
+            //return to the field from where it started
+            setSelectedField(fieldForSensorEdit);
+            setFieldForSensorEdit(null);
+            //dataversion increases so App reloads the data
+            setDataVersion((version) => version + 1);
           }}
         />
       ) : (

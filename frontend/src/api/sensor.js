@@ -14,3 +14,21 @@ export async function createSensor(fieldId, sensorData) {
 
     return response.json();
 }
+
+
+
+export async function updateSensor(sensorId, sensorData) {
+  const response = await apiFetch(`/sensors/${sensorId}`, {
+    method: "PUT",
+    body: JSON.stringify(sensorData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.log("Update sensor error:", errorData);
+    throw new Error("Failed to update sensor");
+  }
+
+  return response.json();
+}
+

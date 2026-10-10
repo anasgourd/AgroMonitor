@@ -4,6 +4,7 @@ import SensorList from "./SensorList";
 
 export default function SensorInventory({
     temperatureSensors,
+    onEditSensor,
 }) {
     return (
         <section className="mb-8">
@@ -29,6 +30,7 @@ export default function SensorInventory({
                     sensorTextColor="text-rose-700"
                     sensorBackground="bg-rose-50"
                     sensorDescription="Temperature sensor"
+                    onEdit={onEditSensor}
                 />
 
             </div>
