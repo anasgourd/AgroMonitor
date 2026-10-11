@@ -97,10 +97,7 @@ export default function FieldDashboard({ field, onBack, onAddSensor, onEditSenso
     .filter((measurement) => measurement.unit === "C")
     .map((measurement) => ({
       value: measurement.value,
-      time: new Date(measurement.timestamp).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
+      time: new Date(measurement.timestamp).toISOString(),
     }));
 
   const history = {
