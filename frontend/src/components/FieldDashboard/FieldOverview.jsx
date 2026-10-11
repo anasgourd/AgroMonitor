@@ -96,7 +96,7 @@ export default function FieldOverview({
                         </div>
                     </div>
 
-                    <div className="mt-4 space-y-3 text-sm text-gray-800/80">
+                    <div className="mt-4 max-h-64 overflow-y-auto space-y-3 pr-2 text-sm text-gray-800/80">
                         {visibleAlerts.length === 0 ? (
                             <p>No unseen alerts.</p>
                         ) : (
@@ -140,8 +140,8 @@ export default function FieldOverview({
                                             disabled={isSeen}
                                             onClick={() => acknowledgeAlert(alert.alert_id)}
                                             className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold ${isSeen
-                                                    ? "bg-red-600 text-white cursor-default"
-                                                    : "bg-white/70 text-gray-900 hover:bg-white"
+                                                ? "bg-red-600 text-white cursor-default"
+                                                : "bg-white/70 text-gray-900 hover:bg-white"
                                                 }`}
                                         >
                                             {isSeen ? "Seen ✓" : "Seen"}
