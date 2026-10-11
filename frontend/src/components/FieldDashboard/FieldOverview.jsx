@@ -38,16 +38,11 @@ export default function FieldOverview({
         );
     }
 
-    const visibleAlerts = [...alerts]
-        .sort(
-            (a, b) =>
-                new Date(b.timestamp).getTime() -
-                new Date(a.timestamp).getTime()
-        )
-        .filter(
-            (alert) => !seenAlerts.includes(alert.alert_id)
-        );
-
+    const visibleAlerts = [...alerts].sort(
+        (a, b) =>
+            new Date(b.timestamp).getTime() -
+            new Date(a.timestamp).getTime()
+    );
     return (
         <div className="lg:col-span-2 bg-[#bfa58c] rounded-3xl border border-[#aa8d70] shadow-sm p-6 flex flex-col">
             <p className="text-xs font-semibold tracking-[0.2em] text-amber-950/70 uppercase">
@@ -119,6 +114,9 @@ export default function FieldOverview({
                                         String(item.id) ===
                                         String(measurement?.sensor_id)
                                 );
+                                const isSeen = seenAlerts.some(
+                                    (id) => String(id) === String(alert.alert_id)
+                                );
 
                                 return (
                                     <div
@@ -139,12 +137,14 @@ export default function FieldOverview({
 
                                         <button
                                             type="button"
-                                            onClick={() =>
-                                                acknowledgeAlert(alert.alert_id)
-                                            }
-                                            className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/70 text-gray-900 hover:bg-white"
+                                            disabled={isSeen}
+                                            onClick={() => acknowledgeAlert(alert.alert_id)}
+                                            className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold ${isSeen
+                                                    ? "bg-red-600 text-white cursor-default"
+                                                    : "bg-white/70 text-gray-900 hover:bg-white"
+                                                }`}
                                         >
-                                            Seen
+                                            {isSeen ? "Seen ✓" : "Seen"}
                                         </button>
                                     </div>
                                 );
