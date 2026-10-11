@@ -48,6 +48,8 @@ export default function FieldDashboard({ field, onBack, onAddSensor, onEditSenso
 
         const measurementMap = Object.fromEntries(measurementResults);
 
+        console.log("Measurement map:", measurementMap);
+
         const mappedSensors = data.map((sensor) =>
           mapSensorFromApi(
             sensor,
@@ -163,13 +165,15 @@ export default function FieldDashboard({ field, onBack, onAddSensor, onEditSenso
           <FieldMap area={field.area} />
 
           <FieldOverview
+            fieldId={field.id}
             name={field.name}
             type={field.type}
             status={field.status}
             message={currentStatus.message}
             alerts={alerts}
+            sensors={sensors}
+            measurements={measurements}
           />
-
         </section>
 
       </div>
