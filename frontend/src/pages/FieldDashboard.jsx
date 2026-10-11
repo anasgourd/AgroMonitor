@@ -33,9 +33,19 @@ export default function FieldDashboard({ field, onBack, onAddSensor, onEditSenso
   const [measurements, setMeasurements] = useState({});
   const [alerts, setAlerts] = useState([]);
 
+
   useEffect(() => {
-    getFieldSensors(field.id)
-      .then(async (data) => {
+    let isActive = true;
+    let isLoading = false;
+
+    async function loadFieldData() {
+      if (isLoading) return;
+
+      isLoading = true;
+
+      try {
+        const data = await getFieldSensors(field.id);
+
         const measurementResults = await Promise.all(
           data.map(async (sensor) => {
             const sensorMeasurements = await getSensorMeasurements(
@@ -48,8 +58,6 @@ export default function FieldDashboard({ field, onBack, onAddSensor, onEditSenso
 
         const measurementMap = Object.fromEntries(measurementResults);
 
-        console.log("Measurement map:", measurementMap);
-
         const mappedSensors = data.map((sensor) =>
           mapSensorFromApi(
             sensor,
@@ -57,16 +65,30 @@ export default function FieldDashboard({ field, onBack, onAddSensor, onEditSenso
           )
         );
 
+        const fieldAlerts = await getFieldAlerts(field.id);
+
+        if (!isActive) return;
+
         setSensors(mappedSensors);
         setMeasurements(measurementMap);
-        const fieldAlerts = await getFieldAlerts(field.id);
         setAlerts(fieldAlerts);
-
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Failed to load field data:", error);
-      });
+      } finally {
+        isLoading = false;
+      }
+    }
+
+    loadFieldData();
+
+    const intervalId = setInterval(loadFieldData, 15000);
+
+    return () => {
+      isActive = false;
+      clearInterval(intervalId);
+    };
   }, [field.id]);
+
 
 
   if (!field) {

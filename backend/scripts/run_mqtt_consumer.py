@@ -3,12 +3,12 @@ from app.logging_config import setup_logging
 from app.mqtt.consumer import MQTTConsumer
 
 
-# Entry point for running the MQTT consumer as a standalone process
+
 def main():
     setup_logging()
 
     consumer = MQTTConsumer(
-        broker="localhost",
+        broker="mqtt",
         port=1883,
         session_factory=SessionLocal
     )
@@ -16,9 +16,9 @@ def main():
     try:
         consumer.start()
 
-        # Keep the process alive while the MQTT loop
-        # runs in the background.
-        input("MQTT consumer running. Press Enter to stop...\n")
+        # Keep the consumer process alive.
+        import threading
+        threading.Event().wait()
 
     finally:
         consumer.stop()

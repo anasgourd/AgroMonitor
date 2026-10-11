@@ -28,3 +28,16 @@ services:
     image: eclipse-mosquitto:2
     ports:
       - "1883:1883"
+
+  consumer:
+    build:
+      context: ./backend
+    command: [ "uv", "run", "python", "scripts/run_mqtt_consumer.py" ]
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:${POSTGRES_PASSWORD}@postgres:5432/agromonitor
+      MQTT_BROKER: mqtt
+      MQTT_PORT: 1883
+      PYTHONPATH: /app
+    depends_on:
+      - postgres
+      - mqtt
