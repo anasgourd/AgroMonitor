@@ -30,6 +30,8 @@ export default function App() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
   const [fieldToEdit, setFieldToEdit] = useState(null);
 
 
@@ -105,7 +107,6 @@ export default function App() {
       localStorage.setItem("access_token", data.access_token);
 
       const user = await getCurrentUser();
-
       setIsLoggedIn(true);
     } catch (error) {
       console.error("Login failed:", error);
@@ -118,7 +119,34 @@ export default function App() {
     setSensorToEdit(sensor);
   }
 
+
   useEffect(() => {
+    async function checkAuthentication() {
+      const token = localStorage.getItem("access_token");
+
+      if (!token) {
+        setIsLoggedIn(false);
+        setIsCheckingAuth(false);
+        return;
+      }
+
+      try {
+        await getCurrentUser();
+        setIsLoggedIn(true);
+      } catch (error) {
+        localStorage.removeItem("access_token");
+        setIsLoggedIn(false);
+      } finally {
+        setIsCheckingAuth(false);
+      }
+    }
+
+    checkAuthentication();
+  }, []);
+
+
+  useEffect(() => {
+
     if (!isLoggedIn) {
       return;
     }
@@ -151,7 +179,11 @@ export default function App() {
         console.error("Failed to load fields:", error);
       });
   }, [isLoggedIn, dataVersion]);
-  // Show login page until the user is authenticated.
+  // Check authentication before rendering the application.
+  if (isCheckingAuth) {
+    return <div>Checking session...</div>;
+  }
+
   if (!isLoggedIn) {
     return <Login onLogin={handleLogin} />;
   }
