@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Activity } from "lucide-react";
 
@@ -43,25 +44,12 @@ export default function FieldOverview({
                 new Date(b.timestamp).getTime() -
                 new Date(a.timestamp).getTime()
         )
-        .filter((alert, index, sortedAlerts) => {
-            const isSeen = seenAlerts.includes(alert.alert_id);
-
-            if (!isSeen) {
-                return true;
-            }
-
-            const recentSeenAlerts = sortedAlerts
-                .filter((item) => seenAlerts.includes(item.alert_id))
-                .slice(0, 5);
-
-            return recentSeenAlerts.some(
-                (item) => item.alert_id === alert.alert_id
-            );
-        });
+        .filter(
+            (alert) => !seenAlerts.includes(alert.alert_id)
+        );
 
     return (
         <div className="lg:col-span-2 bg-[#bfa58c] rounded-3xl border border-[#aa8d70] shadow-sm p-6 flex flex-col">
-
             <p className="text-xs font-semibold tracking-[0.2em] text-amber-950/70 uppercase">
                 FIELD OVERVIEW
             </p>
@@ -97,7 +85,6 @@ export default function FieldOverview({
 
             <div className="mt-auto pt-8">
                 <div className="rounded-2xl bg-white/25 border border-white/30 p-4">
-
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center">
                             <Activity size={20} className="text-white" />
@@ -115,11 +102,10 @@ export default function FieldOverview({
                     </div>
 
                     <div className="mt-4 space-y-3 text-sm text-gray-800/80">
-                        {alerts.length === 0 ? (
-                            <p>No alerts detected.</p>
+                        {visibleAlerts.length === 0 ? (
+                            <p>No unseen alerts.</p>
                         ) : (
                             visibleAlerts.map((alert) => {
-                                const isSeen = seenAlerts.includes(alert.alert_id);
                                 const measurement = Object.values(measurements)
                                     .flat()
                                     .find(
@@ -130,12 +116,9 @@ export default function FieldOverview({
 
                                 const sensor = sensors.find(
                                     (item) =>
-                                        String(item.id) === String(measurement?.sensor_id)
+                                        String(item.id) ===
+                                        String(measurement?.sensor_id)
                                 );
-
-                                console.log("Alert:", alert);
-                                console.log("Matched measurement:", measurement);
-                                console.log("Matched sensor:", sensor);
 
                                 return (
                                     <div
@@ -150,26 +133,18 @@ export default function FieldOverview({
                                             </p>
 
                                             <p className="text-xs text-gray-600 mt-1">
-                                                {new Date(alert.timestamp).toLocaleTimeString([], {
-                                                    day: "2-digit",
-                                                    month: "2-digit",
-                                                    year: "numeric",
-                                                    hour: "2-digit",
-                                                    minute: "2-digit",
-                                                })}
+                                                {new Date(alert.timestamp).toLocaleString()}
                                             </p>
                                         </div>
 
                                         <button
                                             type="button"
-                                            onClick={() => acknowledgeAlert(alert.alert_id)}
-                                            disabled={isSeen}
-                                            className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold ${isSeen
-                                                ? "bg-emerald-200 text-emerald-900 cursor-default"
-                                                : "bg-white/70 text-gray-900 hover:bg-white"
-                                                }`}
+                                            onClick={() =>
+                                                acknowledgeAlert(alert.alert_id)
+                                            }
+                                            className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/70 text-gray-900 hover:bg-white"
                                         >
-                                            {isSeen ? "Seen ✓" : "OK"}
+                                            Seen
                                         </button>
                                     </div>
                                 );
@@ -182,7 +157,6 @@ export default function FieldOverview({
                             {message}
                         </p>
                     </div>
-
                 </div>
             </div>
         </div>
