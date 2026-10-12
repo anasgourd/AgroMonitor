@@ -40,4 +40,5 @@ backend/**/*.pyc
 backend/.env
 
 # Python test cache
-.pytest_cache/
+.pytest_cache/agromonitor_backup*.sql
+/agromonitor_backup.sql

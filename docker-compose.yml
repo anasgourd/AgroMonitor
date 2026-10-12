@@ -7,6 +7,8 @@ services:
       POSTGRES_DB: agromonitor
     ports:
       - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   backend:
     build:
@@ -41,3 +43,6 @@ services:
     depends_on:
       - postgres
       - mqtt
+
+volumes:
+  postgres_data:
