@@ -1,13 +1,20 @@
+
 import { useState } from "react";
 
 export default function Login({ onLogin }) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         event.preventDefault();
+        setErrorMessage("");
 
-        onLogin(username, password);
+        const success = await onLogin(username, password);
+
+        if (!success) {
+            setErrorMessage("Λάθος username ή password. Προσπάθησε ξανά.");
+        }
     }
 
     return (
@@ -35,6 +42,8 @@ export default function Login({ onLogin }) {
                         onChange={(event) => setUsername(event.target.value)}
                         className="w-full border border-gray-300 rounded-lg px-3 py-2"
                         placeholder="Username"
+                        autoComplete="username"
+                        required
                     />
                 </div>
 
@@ -49,8 +58,19 @@ export default function Login({ onLogin }) {
                         onChange={(event) => setPassword(event.target.value)}
                         className="w-full border border-gray-300 rounded-lg px-3 py-2"
                         placeholder="Password"
+                        autoComplete="current-password"
+                        required
                     />
                 </div>
+
+                {errorMessage && (
+                    <p
+                        role="alert"
+                        className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+                    >
+                        {errorMessage}
+                    </p>
+                )}
 
                 <button
                     type="submit"

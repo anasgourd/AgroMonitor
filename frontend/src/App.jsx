@@ -98,20 +98,63 @@ export default function App() {
   }
 
 
+  function handleLogout() {
+    localStorage.removeItem("access_token");
+
+    setIsLoggedIn(false);
+    setSelectedField(null);
+    setShowAddField(false);
+
+    setFields([]);
+    setFieldAlerts({});
+    setFieldSensors({});
+
+    setFieldToEdit(null);
+    setFieldToDelete(null);
+    setFieldToAddSensor(null);
+
+    setSensorToEdit(null);
+    setFieldForSensorEdit(null);
+    setSensorToDelete(null);
+    setFieldForSensorDelete(null);
+  }
+
+  function handleGoHome() {
+    setSelectedField(null);
+    setShowAddField(false);
+    setFieldToEdit(null);
+    setFieldToDelete(null);
+    setFieldToAddSensor(null);
+    setSensorToEdit(null);
+    setFieldForSensorEdit(null);
+    setSensorToDelete(null);
+    setFieldForSensorDelete(null);
+  }
+
+
   // Handle login and update authentication state.
+
 
   async function handleLogin(username, password) {
     try {
       const data = await login(username, password);
-      // Store JWT so it can be used for authenticated API requests.
+
       localStorage.setItem("access_token", data.access_token);
 
-      const user = await getCurrentUser();
+      await getCurrentUser();
       setIsLoggedIn(true);
+
+      return true;
     } catch (error) {
       console.error("Login failed:", error);
+
+      localStorage.removeItem("access_token");
+      setIsLoggedIn(false);
+
+      return false;
     }
   }
+
 
   function handleEditSensor(sensor) {
     setFieldForSensorEdit(selectedField);
@@ -191,7 +234,10 @@ export default function App() {
 
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
 
-      <Header />
+      <Header
+        onLogout={handleLogout}
+        onHome={handleGoHome}
+      />
 
 
       {selectedField ? (
