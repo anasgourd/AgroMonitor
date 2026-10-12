@@ -10,6 +10,7 @@ RUN uv sync --frozen --no-dev
 
 COPY app ./app
 COPY scripts ./scripts
+COPY data ./data
 COPY tests ./tests
 
 EXPOSE 8000
