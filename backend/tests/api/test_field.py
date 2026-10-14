@@ -98,23 +98,24 @@ def test_update_field_invalid_body():
     assert response.status_code == 422
     
 
+
 # DELETE /fields/{field_id} — existing field
-def test_delete_field():
-    # Create a field first so the test does not depend on field_id=1
-    create_response = client.post(
-        "/users/1/fields",
+def test_delete_field(authenticated_client):
+    # Create a field owned by the authenticated user.
+    create_response = authenticated_client.post(
+        "/users/me/fields",
         json={
             "field_name": "Delete Test Field",
             "type": "Test Type",
-            "area": 10.5
-        }
+            "area": 10.5,
+        },
     )
 
     assert create_response.status_code == 201
 
     field_id = create_response.json()["field_id"]
 
-    response = client.delete(f"/fields/{field_id}")
+    response = authenticated_client.delete(f"/fields/{field_id}")
 
     assert response.status_code == 204
 

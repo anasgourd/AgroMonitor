@@ -199,21 +199,20 @@ def test_get_user_fields_invalid_id():
 
     assert response.status_code == 422
 
-# POST /users/{user_id}/fields — valid request
-def test_create_field():
-    response = client.post(
-        "/users/1/fields",
+# POST /users/me/fields — valid request
+def test_create_field(authenticated_client):
+    response = authenticated_client.post(
+        "/users/me/fields",
         json={
             "field_name": "Test Field",
             "type": "Olive Grove",
-            "area": 10.5
-        }
+            "area": 10.5,
+        },
     )
 
     assert response.status_code == 201
 
     data = response.json()
-
     assert "field_id" in data
     assert data["user_id"] == 1
     assert data["field_name"] == "Test Field"
@@ -221,42 +220,47 @@ def test_create_field():
     assert data["area"] == 10.5
 
 
-# POST /users/{user_id}/fields — user does not exist
-def test_create_field_user_not_found():
-    response = client.post(
-        "/users/999999/fields",
+
+
+# POST /users/me/fields — created field belongs to the authenticated user
+def test_create_field_belongs_to_authenticated_user(authenticated_client):
+    response = authenticated_client.post(
+        "/users/me/fields",
         json={
             "field_name": "Test Field",
             "type": "Olive Grove",
-            "area": 10.5
-        }
+            "area": 10.5,
+        },
     )
 
-    assert response.status_code == 404
-    assert response.json()["detail"] == "User not found"
+    assert response.status_code == 201
+    assert response.json()["user_id"] == 1
 
 
-# POST /users/{user_id}/fields — invalid path parameter
-def test_create_field_invalid_user_id():
+# POST /users/me/fields — unauthenticated request is rejected
+
+def test_create_field_requires_authentication(client):
     response = client.post(
-        "/users/abc/fields",
+        "/users/me/fields",
         json={
             "field_name": "Test Field",
             "type": "Olive Grove",
-            "area": 10.5
-        }
+            "area": 10.5,
+        },
     )
 
-    assert response.status_code == 422
+    assert response.status_code == 401
 
 
-# POST /users/{user_id}/fields — missing required fields
-def test_create_field_invalid_body():
-    response = client.post(
-        "/users/1/fields",
+
+
+# POST /users/me/fields — missing required fields are rejected
+def test_create_field_invalid_body(authenticated_client):
+    response = authenticated_client.post(
+        "/users/me/fields",
         json={
-            "field_name": "Test Field"
-        }
+            "field_name": "Test Field",
+        },
     )
 
     assert response.status_code == 422

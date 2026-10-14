@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 from sqlalchemy import URL, text
 from fastapi.testclient import TestClient
 
+from app.core.security import hash_password
+
 # Load the project's root .env.
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 load_dotenv(PROJECT_ROOT / ".env")
@@ -67,31 +69,32 @@ def reset_test_data(create_test_schema):
             connection.execute(table.delete())
 
     with SessionLocal() as db:
+        test_password_hash = hash_password("test-password")       
         # Users: IDs 1,2, 3, 5.
         db.add_all([
             User(
                 user_id=1,
                 username="test_user_1",
                 full_name="Test User 1",
-                password="test-password",
+                password=test_password_hash,
             ),
             User(
                 user_id=2,
                 username="test_user_2",
                 full_name="Test User 2",
-                password="test-password",
+                password=test_password_hash,
             ),
             User(
                 user_id=3,
                 username="tasos",
                 full_name="Anastasis",
-                password="aaa",
+                password=test_password_hash,
             ),
             User(
                 user_id=5,
                 username="test_user_5",
                 full_name="Test User 5",
-                password="test-password",
+                password=test_password_hash,
             ),
         ])
         db.flush()
@@ -229,12 +232,56 @@ def client():
         app.dependency_overrides.clear()
 
 
+# Authenticated test client for user ID 1.
+
+@pytest.fixture
+def authenticated_client(client):
+    response = client.post(
+        "/auth/login",
+        json={
+            "username": "test_user_1",
+            "password": "test-password",
+        },
+    )
+
+    assert response.status_code == 200, response.text
+
+    token = response.json()["access_token"]
+    client.headers.update(
+        {"Authorization": f"Bearer {token}"}
+    )
+
+    return client
+
+# Authenticated test client for user ID 2.
+# Used to test authorization between different users.
+@pytest.fixture
+def second_user_client(client):
+    response = client.post(
+        "/auth/login",
+        json={
+            "username": "test_user_2",
+            "password": "test-password",
+        },
+    )
+
+    assert response.status_code == 200, response.text
+
+    token = response.json()["access_token"]
+    client.headers.update(
+        {"Authorization": f"Bearer {token}"}
+    )
+
+    return client
+
+
+
 @pytest.fixture
 def test_user(db_session):
     user = User(
         username="pytest_user",
         full_name="Pytest User",
-        password="test-password",
+        password=hash_password("test-password"),
     )
     db_session.add(user)
     db_session.commit()
