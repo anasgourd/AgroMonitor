@@ -2,17 +2,6 @@
 import { apiFetch } from "./apiFetch";
 
 
-export async function getUserFields(userId) {
-  const response = await fetch(
-    `${API_BASE_URL}/users/${userId}/fields`
-  );
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch fields");
-  }
-
-  return response.json();
-}
 
 
 export async function getField(fieldId) {
