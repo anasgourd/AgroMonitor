@@ -28,7 +28,10 @@ dist-ssr
 .scannerwork/
 
 # Test coverage
+.coverage
+.coverage.*
 coverage/
+htmlcov/
 
 # Python / Backend
 backend/.venv/
