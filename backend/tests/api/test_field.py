@@ -221,3 +221,103 @@ def test_delete_field_with_sensors(authenticated_client):
     assert response.json()["detail"] == (
         "Cannot delete field because it has associated sensors"
     )
+    
+# GET /fields/{field_id}/sensors — authentication is required
+def test_get_field_sensors_requires_authentication(client):
+    response = client.get("/fields/2/sensors")
+
+    assert response.status_code == 401
+
+
+# GET /fields/{field_id}/sensors — user cannot access another user's field
+def test_get_other_users_field_sensors(authenticated_client):
+    response = authenticated_client.get("/fields/3/sensors")
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Field not found"
+    
+    
+# POST /fields/{field_id}/sensors — owner can create a sensor
+def test_create_field_sensor(authenticated_client):
+    response = authenticated_client.post(
+        "/fields/2/sensors",
+        json={
+            "sensor_name": "New Test Sensor",
+            "status": "active",
+        },
+    )
+
+    assert response.status_code == 201
+
+    data = response.json()
+
+    assert data["field_id"] == 2
+    assert data["sensor_name"] == "New Test Sensor"
+    assert data["status"] == "active"
+    assert "sensor_id" in data
+
+
+# POST /fields/{field_id}/sensors — field does not exist
+def test_create_sensor_field_not_found(authenticated_client):
+    response = authenticated_client.post(
+        "/fields/999999/sensors",
+        json={
+            "sensor_name": "New Test Sensor",
+            "status": "active",
+        },
+    )
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Field not found"
+
+
+# POST /fields/{field_id}/sensors — invalid field ID format
+def test_create_sensor_invalid_field_id(authenticated_client):
+    response = authenticated_client.post(
+        "/fields/abc/sensors",
+        json={
+            "sensor_name": "New Test Sensor",
+            "status": "active",
+        },
+    )
+
+    assert response.status_code == 422
+
+
+# POST /fields/{field_id}/sensors — authentication is required
+def test_create_sensor_requires_authentication(client):
+    response = client.post(
+        "/fields/2/sensors",
+        json={
+            "sensor_name": "New Test Sensor",
+            "status": "active",
+        },
+    )
+
+    assert response.status_code == 401
+
+
+# POST /fields/{field_id}/sensors — user cannot add a sensor to another user's field
+def test_create_sensor_for_other_users_field(authenticated_client):
+    response = authenticated_client.post(
+        "/fields/3/sensors",
+        json={
+            "sensor_name": "Unauthorized Sensor",
+            "status": "active",
+        },
+    )
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Field not found"
+
+
+# POST /fields/{field_id}/sensors — invalid request body
+def test_create_sensor_invalid_body(authenticated_client):
+    response = authenticated_client.post(
+        "/fields/2/sensors",
+        json={
+            "sensor_name": "New Test Sensor",
+        },
+    )
+
+    assert response.status_code == 422
