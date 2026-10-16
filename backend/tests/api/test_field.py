@@ -321,3 +321,53 @@ def test_create_sensor_invalid_body(authenticated_client):
     )
 
     assert response.status_code == 422
+    
+    
+    
+
+# GET /fields/{field_id}/alerts
+
+def test_get_field_alerts(authenticated_client):
+    # Field 3 belongs to user 3, so create a field owned by user 1.
+    create_response = authenticated_client.post(
+        "/users/me/fields",
+        json={
+            "field_name": "Alerts Test Field",
+            "type": "Olive Grove",
+            "area": 10.5,
+        },
+    )
+    assert create_response.status_code == 201
+    field_id = create_response.json()["field_id"]
+
+    response = authenticated_client.get(f"/fields/{field_id}/alerts")
+
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+
+
+def test_get_field_alerts_requires_authentication(client):
+    response = client.get("/fields/2/alerts")
+
+    assert response.status_code == 401
+
+
+def test_get_field_alerts_not_owned(authenticated_client):
+    # Seeded field 3 belongs to user 3, not authenticated user 1.
+    response = authenticated_client.get("/fields/3/alerts")
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Field not found"
+
+
+def test_get_field_alerts_not_found(authenticated_client):
+    response = authenticated_client.get("/fields/999999/alerts")
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Field not found"
+
+
+def test_get_field_alerts_invalid_id(authenticated_client):
+    response = authenticated_client.get("/fields/abc/alerts")
+
+    assert response.status_code == 422

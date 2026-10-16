@@ -104,25 +104,26 @@ def create_sensor(
     sensor_service = SensorService(db)
     return sensor_service.create_sensor(field_id, sensor_data)
 
-#endpoint for get alerts of the assosiated field
+
+# GET alerts associated with a field
 @router.get(
     "/{field_id}/alerts",
     response_model=list[AlertResponse]
 )
 def get_field_alerts(
     field_id: int,
+    current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
 ) -> list[AlertResponse]:
 
     field_service = FieldService(db)
-    alert_service = AlertService(db)
-
     field = field_service.get_field(field_id)
 
-    if field is None:
+    if field is None or field.user_id != current_user_id:
         raise HTTPException(
             status_code=404,
             detail="Field not found"
         )
 
+    alert_service = AlertService(db)
     return alert_service.get_field_alerts(field_id)
