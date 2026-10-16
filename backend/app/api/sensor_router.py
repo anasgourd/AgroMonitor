@@ -5,12 +5,38 @@ from app.schemas.sensor import SensorResponse,SensorUpdate
 from app.services.sensor_service import SensorService
 from app.schemas.measurement import MeasurementResponse
 from app.services.measurement_service import MeasurementService
-
+from app.services.field_service import FieldService
+from app.core.security import get_current_user_id
 
 router = APIRouter(
     prefix="/sensors",
     tags=["Sensors"]
 )
+
+
+def get_owned_sensor(
+    sensor_id: int,
+    current_user_id: int,
+    db: Session
+):
+    sensor = SensorService(db).get_sensor(sensor_id)
+
+    if sensor is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Sensor not found"
+        )
+
+    field = FieldService(db).get_field(sensor.field_id)
+    # A sensor belongs to a field, so we check ownership through its parent field.
+
+    if field is None or field.user_id != current_user_id:
+        raise HTTPException(
+            status_code=404,
+            detail="Sensor not found"
+        )
+
+    return sensor
 
 
 @router.get(
@@ -19,20 +45,11 @@ router = APIRouter(
 )
 def get_sensor(
     sensor_id: int,
+    current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
 ) -> SensorResponse:
 
-    service = SensorService(db)
-
-    sensor = service.get_sensor(sensor_id)
-
-    if sensor is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Sensor not found"
-        )
-
-    return sensor
+    return get_owned_sensor(sensor_id, current_user_id, db)
 
 @router.put(
     "/{sensor_id}",
@@ -41,12 +58,13 @@ def get_sensor(
 def update_sensor(
     sensor_id: int,
     sensor_data: SensorUpdate,
+    current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
 ) -> SensorResponse:
 
-    service = SensorService(db)
+    get_owned_sensor(sensor_id, current_user_id, db)
 
-    sensor = service.update_sensor(
+    sensor = SensorService(db).update_sensor(
         sensor_id,
         sensor_data
     )
@@ -60,18 +78,20 @@ def update_sensor(
     return sensor
 
 
+
 @router.delete(
     "/{sensor_id}",
     status_code=204
 )
 def delete_sensor(
     sensor_id: int,
+    current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
 ) -> None:
 
-    service = SensorService(db)
+    get_owned_sensor(sensor_id, current_user_id, db)
 
-    result = service.delete_sensor(sensor_id)
+    result = SensorService(db).delete_sensor(sensor_id)
 
     if result == "not_found":
         raise HTTPException(
@@ -93,18 +113,12 @@ def delete_sensor(
 )
 def get_sensor_measurements(
     sensor_id: int,
+    current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
 ) -> list[MeasurementResponse]:
 
-    sensor_service = SensorService(db)
+    get_owned_sensor(sensor_id, current_user_id, db)
+
     measurement_service = MeasurementService(db)
-
-    sensor = sensor_service.get_sensor(sensor_id)
-
-    if sensor is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Sensor not found"
-        )
 
     return measurement_service.get_sensor_measurements(sensor_id)
