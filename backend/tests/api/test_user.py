@@ -298,3 +298,41 @@ def test_create_field_invalid_body(authenticated_client):
     )
 
     assert response.status_code == 422
+
+
+
+# GET /users/{user_id}/alerts 
+
+def test_get_user_alerts(authenticated_client):
+    # User 1 is authenticated. User 1 has no seeded alerts.
+    response = authenticated_client.get("/users/1/alerts")
+
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_get_user_alerts_requires_authentication(client):
+    response = client.get("/users/1/alerts")
+
+    assert response.status_code == 401
+
+
+def test_get_other_user_alerts_forbidden(authenticated_client):
+    # User 3 owns the seeded alert, but the client is authenticated as user 1.
+    response = authenticated_client.get("/users/3/alerts")
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "User not found"
+
+
+def test_get_user_alerts_not_found(authenticated_client):
+    response = authenticated_client.get("/users/999999/alerts")
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "User not found"
+
+
+def test_get_user_alerts_invalid_id(authenticated_client):
+    response = authenticated_client.get("/users/abc/alerts")
+
+    assert response.status_code == 422

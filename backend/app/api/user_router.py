@@ -155,19 +155,24 @@ def create_current_user_field(
 
     return field_service.create_field(user_id, field_data)
 
-#to be done wtih auth when we deal with alerts
+
 @router.get(
     "/{user_id}/alerts",
     response_model=list[AlertResponse]
 )
 def get_user_alerts(
     user_id: int,
+    current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
 ) -> list[AlertResponse]:
 
-    user_service = UserService(db)
-    alert_service = AlertService(db)
+    if user_id != current_user_id:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
 
+    user_service = UserService(db)
     user = user_service.get_user(user_id)
 
     if user is None:
@@ -176,5 +181,7 @@ def get_user_alerts(
             detail="User not found"
         )
 
+    alert_service = AlertService(db)
     return alert_service.get_user_alerts(user_id)
+
 
