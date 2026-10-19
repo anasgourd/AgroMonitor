@@ -78,7 +78,6 @@ class AlertRepository:
         )
 
         self.db.add(alert)
-        self.db.commit()
-        self.db.refresh(alert)
+        self.db.flush()
 
         return alert

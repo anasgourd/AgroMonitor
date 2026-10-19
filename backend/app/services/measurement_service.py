@@ -20,6 +20,8 @@ from app.services.anomaly_detection.threshold_strategy import (
 from app.services.alert_service import AlertService
 
 from app.metrics import measurements_stored, anomalies_detected
+from app.metrics import alerts_created
+
 
 logger = logging.getLogger(__name__)
 
@@ -43,60 +45,58 @@ class MeasurementService:
     ) -> Measurement | None:
 
         return self.repository.get_by_id(measurement_id)
-    def record_measurement(
-        self,
-        measurement_data: MeasurementInput
-    ) -> Measurement:
-        sensor_service = SensorService(self.repository.db)
-        sensor = sensor_service.get_sensor(measurement_data.sensor_id)
+    def record_measurement(self, measurement_data: MeasurementInput) -> Measurement:
+        db = self.repository.db
 
-        if sensor is None:
-            logger.warning(
-                "Measurement rejected: sensor %s not found",
-                measurement_data.sensor_id
-            )
-            raise SensorNotFoundError()
-        
-        if sensor.status != "active":
-            logger.warning(
-            "Measurement rejected: sensor %s is inactive",
-            measurement_data.sensor_id
-            )
-            raise InactiveSensorError()
-        
-        # Compare timezone-aware timestamps using UTC
-        if measurement_data.timestamp > datetime.now(timezone.utc):
-            logger.warning(
-                "Measurement rejected: timestamp is in the future"
-            )
-            raise FutureMeasurementTimestampError()
+        try:
+            sensor_service = SensorService(db)
+            sensor = sensor_service.get_sensor(measurement_data.sensor_id)
 
-        #anomaly detection
-        is_anomalous = self.anomaly_detector.is_anomalous(
-            measurement_data.value
-        )
+            if sensor is None:
+                raise SensorNotFoundError()
 
-        measurement = self.repository.create(
-            measurement_data,
-            is_anomalous
-        )
-        
+            if sensor.status != "active":
+                raise InactiveSensorError()
+
+            if measurement_data.timestamp > datetime.now(timezone.utc):
+                raise FutureMeasurementTimestampError()
+
+            is_anomalous = self.anomaly_detector.is_anomalous(
+                measurement_data.value
+            )
+
+            measurement = self.repository.create(
+                measurement_data,
+                is_anomalous
+            )
+
+            if is_anomalous:
+                self.alert_service.create_alert(
+                    measurement_id=measurement.measurement_id,
+                    message="Anomaly detected",
+                    timestamp=measurement.timestamp
+                )
+
+            # Save the ID before committing.
+            measurement_id = measurement.measurement_id
+
+            # Commit measurement and alert atomically.
+            db.commit()
+
+        except Exception:
+            db.rollback()
+            raise
+
+        # Update metrics only after successful commit.
         measurements_stored.inc()
-        
-        #trigger the alert if anomaly detected
+
         if is_anomalous:
-            
             anomalies_detected.inc()
-            
-            self.alert_service.create_alert(
-                measurement_id=measurement.measurement_id,
-                message="Anomaly detected",
-                timestamp=measurement.timestamp
-            )
+            alerts_created.inc()
 
         logger.info(
             "Measurement %s stored successfully",
-            measurement.measurement_id
+            measurement_id
         )
 
         return measurement

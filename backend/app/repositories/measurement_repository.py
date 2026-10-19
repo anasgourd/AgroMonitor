@@ -43,7 +43,6 @@ class MeasurementRepository:
         )
 
         self.db.add(measurement)
-        self.db.commit()
-        self.db.refresh(measurement)
+        self.db.flush()
 
         return measurement

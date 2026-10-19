@@ -1,10 +1,7 @@
 from sqlalchemy.orm import Session
-
 from app.models.alert import Alert
 from app.repositories.alert_repository import AlertRepository
 from datetime import datetime
-
-from app.metrics import alerts_created
 
 class AlertService:
     def __init__(self, db: Session):
@@ -43,7 +40,5 @@ class AlertService:
             message,
             timestamp
         )
-        
-        alerts_created.inc()
-        
+                
         return alert
