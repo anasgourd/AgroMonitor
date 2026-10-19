@@ -1,0 +1,5 @@
+user agromonitor_publisher
+topic write agromonitor/sensors
+
+user agromonitor_consumer
+topic read agromonitor/sensors
