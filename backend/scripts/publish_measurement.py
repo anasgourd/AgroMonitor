@@ -4,13 +4,15 @@ import os
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-
+import ssl
 import paho.mqtt.client as mqtt
 
 
 BROKER = os.getenv("MQTT_BROKER", "localhost")
 PORT = int(os.getenv("MQTT_PORT", "1883"))
 TOPIC = "agromonitor/sensors"
+
+
 
 DATA_FILE = Path(__file__).resolve().parents[1] / "data" / "data.csv"
 
@@ -26,6 +28,22 @@ def main():
     username=os.environ["MQTT_PUBLISHER_USERNAME"],
     password=os.environ["MQTT_PUBLISHER_PASSWORD"],
     )
+    
+    # MQTT TLS
+    tls_enabled = (
+        os.environ.get("MQTT_PUBLISHER_TLS_ENABLED", "false").lower()
+        == "true"
+    )
+
+    if tls_enabled:
+        ca_cert = os.environ.get("MQTT_PUBLISHER_CA_CERT") or None
+
+        client.tls_set(
+            ca_certs=ca_cert,
+            cert_reqs=ssl.CERT_REQUIRED,
+            tls_version=ssl.PROTOCOL_TLS_CLIENT,
+        )
+        
     client.connect(BROKER, PORT, 60)
     
     client.loop_start()

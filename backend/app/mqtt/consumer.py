@@ -9,7 +9,10 @@ from app.exceptions.measurement import SensorNotFoundError,InactiveSensorError,F
 from sqlalchemy.exc import SQLAlchemyError
 from app.metrics import mqtt_messages_received,mqtt_messages_rejected
 import os
+import ssl
 logger = logging.getLogger(__name__)
+import ssl
+
 
 
 class MQTTConsumer:
@@ -24,23 +27,44 @@ class MQTTConsumer:
         self.port = port
         self.session_factory = session_factory
         self.service_factory = service_factory
-        
-        password = os.environ["MQTT_CONSUMER_PASSWORD"]
 
         self.client = mqtt.Client(
             mqtt.CallbackAPIVersion.VERSION2
         )
         
+        # MQTT Authentication
         self.client.username_pw_set(
             username=os.environ["MQTT_CONSUMER_USERNAME"],
             password=os.environ["MQTT_CONSUMER_PASSWORD"],
         )
+        
+        # MQTT TLS
+        tls_enabled = (
+            os.environ.get("MQTT_CONSUMER_TLS_ENABLED", "false").lower()
+            == "true"
+        )
+
+        if tls_enabled:
+            ca_cert = os.environ.get("MQTT_CONSUMER_CA_CERT") or None
+
+            self.client.tls_set(
+                ca_certs=ca_cert,
+                cert_reqs=ssl.CERT_REQUIRED,
+                tls_version=ssl.PROTOCOL_TLS_CLIENT,
+            )
                 
 
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
         
     def on_connect(self, client, userdata, flags, reason_code, properties):
+        if reason_code.is_failure:
+            logger.error(
+                "MQTT connection failed: %s",
+                reason_code
+            )
+            return
+
         logger.info("Connected to MQTT broker")
         client.subscribe("agromonitor/sensors")
 
