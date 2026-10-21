@@ -22,7 +22,16 @@ def main():
     published_count = 0
 
     client = mqtt.Client()
+    client.username_pw_set(
+    username=os.environ["MQTT_PUBLISHER_USERNAME"],
+    password=os.environ["MQTT_PUBLISHER_PASSWORD"],
+    )
     client.connect(BROKER, PORT, 60)
+    
+    client.loop_start()
+
+    # Wait briefly for the broker's authentication response
+    time.sleep(1)
 
     with open(DATA_FILE, newline="") as file:
         reader = csv.reader(file)
@@ -52,6 +61,7 @@ def main():
             time.sleep(DELAY_SECONDS)
 
     client.disconnect()
+    client.loop_stop()
 
     print(f"Total published: {published_count}")
 

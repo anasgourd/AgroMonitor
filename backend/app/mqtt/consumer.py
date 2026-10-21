@@ -8,7 +8,7 @@ from pydantic import ValidationError
 from app.exceptions.measurement import SensorNotFoundError,InactiveSensorError,FutureMeasurementTimestampError
 from sqlalchemy.exc import SQLAlchemyError
 from app.metrics import mqtt_messages_received,mqtt_messages_rejected
-
+import os
 logger = logging.getLogger(__name__)
 
 
@@ -24,10 +24,18 @@ class MQTTConsumer:
         self.port = port
         self.session_factory = session_factory
         self.service_factory = service_factory
+        
+        password = os.environ["MQTT_CONSUMER_PASSWORD"]
 
         self.client = mqtt.Client(
             mqtt.CallbackAPIVersion.VERSION2
         )
+        
+        self.client.username_pw_set(
+            username=os.environ["MQTT_CONSUMER_USERNAME"],
+            password=os.environ["MQTT_CONSUMER_PASSWORD"],
+        )
+                
 
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message

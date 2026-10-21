@@ -17,6 +17,10 @@ services:
       DATABASE_URL: postgresql+psycopg://postgres:${POSTGRES_PASSWORD}@postgres:5432/agromonitor
       MQTT_BROKER: mqtt
       MQTT_PORT: 1883
+      MQTT_CONSUMER_HOST: mqtt
+      MQTT_CONSUMER_PORT: "1883"
+      MQTT_CONSUMER_USERNAME: ${MQTT_CONSUMER_USERNAME}
+      MQTT_CONSUMER_PASSWORD: ${MQTT_CONSUMER_PASSWORD}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_ALGORITHM: ${JWT_ALGORITHM}
       JWT_EXPIRE_MINUTES: ${JWT_EXPIRE_MINUTES}
@@ -29,7 +33,10 @@ services:
   mqtt:
     image: eclipse-mosquitto:2
     ports:
-      - "1883:1883"
+      - "127.0.0.1:1883:1883"
+    volumes:
+      - ./mqtt/config:/mosquitto/config:ro
+    restart: unless-stopped
 
   consumer:
     build:
@@ -39,6 +46,10 @@ services:
       DATABASE_URL: postgresql+psycopg://postgres:${POSTGRES_PASSWORD}@postgres:5432/agromonitor
       MQTT_BROKER: mqtt
       MQTT_PORT: 1883
+      MQTT_CONSUMER_HOST: mqtt
+      MQTT_CONSUMER_PORT: "1883"
+      MQTT_CONSUMER_USERNAME: ${MQTT_CONSUMER_USERNAME}
+      MQTT_CONSUMER_PASSWORD: ${MQTT_CONSUMER_PASSWORD}
       PYTHONPATH: /app
     depends_on:
       - postgres
@@ -59,13 +70,15 @@ services:
       - backend
 
   publisher:
-    profiles: ["tools"]
+    profiles: [ "tools" ]
     build:
       context: ./backend
-    command: ["uv", "run", "python", "-m", "scripts.publish_measurement"]
+    command: [ "uv", "run", "python", "-m", "scripts.publish_measurement" ]
     environment:
       MQTT_BROKER: mqtt
       MQTT_PORT: 1883
+      MQTT_PUBLISHER_USERNAME: ${MQTT_PUBLISHER_USERNAME}
+      MQTT_PUBLISHER_PASSWORD: ${MQTT_PUBLISHER_PASSWORD}
       PYTHONPATH: /app
     depends_on:
       - mqtt

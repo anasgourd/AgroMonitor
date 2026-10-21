@@ -6,10 +6,13 @@ import os
 
 def main():
     setup_logging()
+    
+    host = os.environ["MQTT_CONSUMER_HOST"]
+    port = int(os.environ.get("MQTT_CONSUMER_PORT", "1883"))
 
     consumer = MQTTConsumer(
-        broker=os.getenv("MQTT_BROKER", "mqtt"),
-        port=int(os.getenv("MQTT_PORT", "1883")),
+        broker=host,
+        port=port,
         session_factory=SessionLocal
     )
 
