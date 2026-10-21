@@ -2,27 +2,30 @@ from app.core.database import SessionLocal
 from app.logging_config import setup_logging
 from app.mqtt.consumer import MQTTConsumer
 import os
+import signal
+import threading
 
 
 def main():
     setup_logging()
-    
-    host = os.environ["MQTT_CONSUMER_HOST"]
-    port = int(os.environ.get("MQTT_CONSUMER_PORT", "1883"))
+
+    shutdown_event = threading.Event()
+
+    def request_shutdown(signum, frame):
+        shutdown_event.set()
+
+    signal.signal(signal.SIGTERM, request_shutdown)
+    signal.signal(signal.SIGINT, request_shutdown)
 
     consumer = MQTTConsumer(
-        broker=host,
-        port=port,
+        broker=os.environ["MQTT_CONSUMER_HOST"],
+        port=int(os.environ.get("MQTT_CONSUMER_PORT", "1883")),
         session_factory=SessionLocal
     )
 
     try:
         consumer.start()
-
-        # Keep the consumer process alive.
-        import threading
-        threading.Event().wait()
-
+        shutdown_event.wait()
     finally:
         consumer.stop()
 

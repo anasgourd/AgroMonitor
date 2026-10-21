@@ -55,18 +55,27 @@ class MQTTConsumer:
                 
 
         self.client.on_connect = self.on_connect
+        self.client.on_disconnect = self.on_disconnect
         self.client.on_message = self.on_message
         
     def on_connect(self, client, userdata, flags, reason_code, properties):
-        if reason_code.is_failure:
-            logger.error(
-                "MQTT connection failed: %s",
-                reason_code
-            )
-            return
+        if reason_code == 0:
+            logger.info("Connected to MQTT broker")
+            client.subscribe("agromonitor/sensors", qos=0)
+        else:
+            logger.error("MQTT connection rejected: %s", reason_code)
 
-        logger.info("Connected to MQTT broker")
-        client.subscribe("agromonitor/sensors")
+            logger.info("Connected to MQTT broker")
+            client.subscribe("agromonitor/sensors")
+    
+    def on_disconnect(
+        self, client, userdata, disconnect_flags,
+        reason_code, properties
+    ):
+        if reason_code != 0:
+            logger.warning("MQTT connection lost: %s", reason_code)
+        else:
+            logger.info("MQTT disconnected normally")
 
     def on_message(self, _client, _userdata, message):
         
@@ -121,6 +130,7 @@ class MQTTConsumer:
             measurement_service.record_measurement(measurement)
 
         except SensorNotFoundError:
+            mqtt_messages_rejected.inc()
             logger.warning(
                 "MQTT measurement rejected: sensor %s not found",
                 measurement.sensor_id
@@ -148,7 +158,17 @@ class MQTTConsumer:
             db.close()
 
     def start(self):
-        self.client.connect(self.broker, self.port)
+        self.client.reconnect_delay_set(
+            min_delay=1,
+            max_delay=30
+        )
+
+        self.client.connect_async(
+            self.broker,
+            self.port,
+            keepalive=60
+        )
+
         self.client.loop_start()
     
     def stop(self):
