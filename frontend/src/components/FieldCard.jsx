@@ -12,11 +12,13 @@ export default function FieldCard({ field, onSelect, onEdit, onDelete, isMonitor
     Alert: "bg-rose-500",
   };
 
-  const fieldImages = {
-    "Μπέης": "from-emerald-400 to-teal-500",
-    "Βαίτσα": "from-amber-400 to-orange-500",
-    "Ευανθία": "from-rose-400 to-pink-500",
-  };
+  const fieldColors = [
+    "from-emerald-400 to-teal-500",
+    "from-amber-400 to-orange-500",
+    "from-rose-400 to-pink-500",
+  ];
+
+  const color = fieldColors[(field.id - 1) % fieldColors.length];
 
   return (
 
@@ -25,11 +27,10 @@ export default function FieldCard({ field, onSelect, onEdit, onDelete, isMonitor
       {/* FIELD IMAGE */}
 
       <div
-        className={`h-32 bg-gradient-to-br ${fieldImages[field.name]} flex items-center justify-center text-4xl shadow-inner`}
+        className={`h-32 bg-gradient-to-br ${color} flex items-center justify-center text-4xl shadow-inner`}
       >
         🌿
       </div>
-
 
       {/* CONTENT */}
 
