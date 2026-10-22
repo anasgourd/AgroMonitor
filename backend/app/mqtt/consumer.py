@@ -64,9 +64,6 @@ class MQTTConsumer:
             client.subscribe("agromonitor/sensors", qos=0)
         else:
             logger.error("MQTT connection rejected: %s", reason_code)
-
-            logger.info("Connected to MQTT broker")
-            client.subscribe("agromonitor/sensors")
     
     def on_disconnect(
         self, client, userdata, disconnect_flags,
