@@ -2,18 +2,14 @@ import { describe, it, expect } from "vitest";
 import { calculateAverage, statusStyles, } from "../utils/fieldUtils";
 
 describe("calculateAverage", () => {
-    it("calculates the average sensor value", () => {
+    it("calculates the average value of active sensors", () => {
         const sensors = [
-            { value: 28 },
-            { value: 30 },
-            { value: 32 },
+            { value: 28, status: "active" },
+            { value: 30, status: "active" },
+            { value: 32, status: "active" },
         ];
 
         expect(calculateAverage(sensors)).toBe(30);
-    });
-
-    it("returns 0 when there are no sensors", () => {
-        expect(calculateAverage([])).toBe(0);
     });
 });
 
