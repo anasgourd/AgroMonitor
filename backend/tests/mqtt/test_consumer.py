@@ -7,7 +7,10 @@ from app.exceptions.measurement import (
     FutureMeasurementTimestampError,
 )
 from sqlalchemy.exc import SQLAlchemyError
-
+from unittest.mock import patch
+import logging
+import ssl
+import pytest
 
 def create_consumer():
 
@@ -227,3 +230,117 @@ def test_invalid_payload_encoding_is_rejected():
     consumer.on_message(None, None, message)
 
     measurement_service.record_measurement.assert_not_called()
+    
+
+#for mqtt security tests
+
+#Connection tests
+def test_successful_connection_subscribes(caplog):
+    consumer, _ = create_consumer()
+    client = MagicMock()
+
+    with caplog.at_level(logging.INFO):
+        consumer.on_connect(client, None, None, 0, None)
+
+    client.subscribe.assert_called_once_with(
+        "agromonitor/sensors",
+        qos=0
+    )
+    assert "Connected to MQTT broker" in caplog.text
+
+
+def test_rejected_connection_does_not_subscribe(caplog):
+    consumer, _ = create_consumer()
+    client = MagicMock()
+
+    with caplog.at_level(logging.ERROR):
+        consumer.on_connect(client, None, None, 5, None)
+
+    client.subscribe.assert_not_called()
+    assert "MQTT connection rejected" in caplog.text
+    
+# Disconnection tests
+def test_unexpected_disconnect_logs_warning(caplog):
+    consumer, _ = create_consumer()
+
+    with caplog.at_level(logging.WARNING):
+        consumer.on_disconnect(
+            MagicMock(), None, None, 1, None
+        )
+
+    assert "MQTT connection lost" in caplog.text
+
+
+def test_normal_disconnect_logs_info(caplog):
+    consumer, _ = create_consumer()
+
+    with caplog.at_level(logging.INFO):
+        consumer.on_disconnect(
+            MagicMock(), None, None, 0, None
+        )
+
+    assert "MQTT disconnected normally" in caplog.text
+    
+# Start and stop tests
+
+
+def test_start_configures_reconnection():
+    consumer, _ = create_consumer()
+    consumer.client = MagicMock()
+
+    consumer.start()
+
+    consumer.client.reconnect_delay_set.assert_called_once_with(
+        min_delay=1,
+        max_delay=30
+    )
+
+    consumer.client.connect_async.assert_called_once_with(
+        "localhost",
+        1883,
+        keepalive=60
+    )
+
+    consumer.client.loop_start.assert_called_once()
+
+
+def test_stop_disconnects_and_stops_loop():
+    consumer, _ = create_consumer()
+    consumer.client = MagicMock()
+
+    consumer.stop()
+
+    consumer.client.disconnect.assert_called_once()
+    consumer.client.loop_stop.assert_called_once()
+    
+# TLS configuration tests
+
+
+@pytest.mark.parametrize("tls_enabled", ["false", "true"])
+def test_tls_configuration(tls_enabled):
+    with patch.dict(
+        "os.environ",
+        {
+            "MQTT_CONSUMER_USERNAME": "test_user",
+            "MQTT_CONSUMER_PASSWORD": "test_password",
+            "MQTT_CONSUMER_TLS_ENABLED": tls_enabled,
+            "MQTT_CONSUMER_CA_CERT": "",
+        }
+    ):
+        with patch("app.mqtt.consumer.mqtt.Client") as mock_client:
+            MQTTConsumer(
+                broker="localhost",
+                port=1883,
+                session_factory=MagicMock()
+            )
+
+            client = mock_client.return_value
+
+            if tls_enabled == "true":
+                client.tls_set.assert_called_once_with(
+                    ca_certs=None,
+                    cert_reqs=ssl.CERT_REQUIRED,
+                    tls_version=ssl.PROTOCOL_TLS_CLIENT
+                )
+            else:
+                client.tls_set.assert_not_called()
