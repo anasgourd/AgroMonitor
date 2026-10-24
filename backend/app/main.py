@@ -10,6 +10,9 @@ from app.api.auth_router import router as auth_router
 from app.logging_config import setup_logging
 
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
+from app.core.rate_limit import limiter
 
 app = FastAPI(
     title="AgroMonitor API",
@@ -22,6 +25,13 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+)
+
+app.state.limiter = limiter
+
+app.add_exception_handler(
+    RateLimitExceeded,
+    _rate_limit_exceeded_handler,
 )
 
 setup_logging()

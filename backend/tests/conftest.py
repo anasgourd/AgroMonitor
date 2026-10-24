@@ -9,6 +9,21 @@ from sqlalchemy import URL, text
 from fastapi.testclient import TestClient
 
 from app.core.security import hash_password
+from app.core.rate_limit import limiter
+
+@pytest.fixture(autouse=True)
+def configure_rate_limiting(request):
+    is_rate_limit_test = (
+        request.node.path.name == "test_rate_limit.py"
+    )
+
+    limiter.enabled = is_rate_limit_test
+    limiter._storage.reset()
+
+    yield
+
+    limiter.enabled = True
+    limiter._storage.reset()
 
 # Load the project's root .env.
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
