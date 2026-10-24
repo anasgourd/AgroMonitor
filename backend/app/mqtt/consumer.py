@@ -91,9 +91,8 @@ class MQTTConsumer:
             return
         
         logger.info(
-            "MQTT message received on topic %s: %s",
-            message.topic,
-            payload
+            "MQTT message received on topic %s",
+            message.topic
         )
         
         #catching validation errors in the payload
@@ -109,9 +108,9 @@ class MQTTConsumer:
             mqtt_messages_rejected.inc()
             
             logger.warning(
-                "Invalid MQTT measurement payload: %s",
-                payload
+                "Invalid MQTT measurement payload"
             )
+            
             return
 
         logger.info(

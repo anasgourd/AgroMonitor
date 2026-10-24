@@ -12,9 +12,14 @@ password_hash = PasswordHash.recommended()
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 load_dotenv(PROJECT_ROOT / ".env")
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
-JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+JWT_ALGORITHM = "HS256"
 JWT_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", "30"))
 
+if not JWT_SECRET_KEY or len(JWT_SECRET_KEY.encode("utf-8")) < 32:
+    raise RuntimeError(
+        "JWT_SECRET_KEY must contain at least 32 bytes"
+    )
+    
 security = HTTPBearer()
 
 
@@ -26,6 +31,7 @@ def get_current_user_id(
             credentials.credentials,
             JWT_SECRET_KEY,
             algorithms=[JWT_ALGORITHM],
+            options={"require": ["sub", "exp"]},
         )
 
         user_id = payload.get("sub")
