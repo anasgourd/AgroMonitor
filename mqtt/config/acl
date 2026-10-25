@@ -1,5 +1,7 @@
 user agromonitor_publisher
 topic write agromonitor/sensors
+topic write agromonitor/cloud/sensors
 
 user agromonitor_consumer
 topic read agromonitor/sensors
+topic read agromonitor/cloud/sensors

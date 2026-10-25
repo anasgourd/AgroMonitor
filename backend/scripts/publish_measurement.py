@@ -10,18 +10,21 @@ import paho.mqtt.client as mqtt
 
 BROKER = os.getenv("MQTT_BROKER", "localhost")
 PORT = int(os.getenv("MQTT_PORT", "1883"))
-TOPIC = "agromonitor/sensors"
-
+TOPIC = os.getenv("MQTT_PUBLISHER_TOPIC", "agromonitor/sensors")
+SENSOR_ID = int(os.getenv("MQTT_PUBLISHER_SENSOR_ID", "1"))
 
 
 DATA_FILE = Path(__file__).resolve().parents[1] / "data" / "data.csv"
 
 DELAY_SECONDS = 0.1
-MAX_MEASUREMENTS = 10
+MAX_MEASUREMENTS = int(os.getenv("MAX_MEASUREMENTS", "10"))
 
 
 def main():
     published_count = 0
+    print(f"MQTT target: {BROKER}:{PORT}")
+    print(f"MQTT topic: {TOPIC}")
+    print(f"Sensor ID: {SENSOR_ID}")
 
     client = mqtt.Client()
     client.username_pw_set(
@@ -62,7 +65,7 @@ def main():
             timestamp = datetime.now(timezone.utc)
 
             payload = {
-                "sensor_id": 1,
+                "sensor_id": SENSOR_ID,
                 "value": value,
                 "timestamp": timestamp.isoformat(),
                 "unit": "C",

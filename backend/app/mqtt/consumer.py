@@ -28,6 +28,7 @@ class MQTTConsumer:
         self.port = port
         self.session_factory = session_factory
         self.service_factory = service_factory
+        self.topic = os.getenv("MQTT_CONSUMER_TOPIC", "agromonitor/sensors")
 
         self.client = mqtt.Client(
             mqtt.CallbackAPIVersion.VERSION2
@@ -62,7 +63,7 @@ class MQTTConsumer:
     def on_connect(self, client, userdata, flags, reason_code, properties):
         if reason_code == 0:
             logger.info("Connected to MQTT broker")
-            client.subscribe("agromonitor/sensors", qos=0)
+            client.subscribe(self.topic, qos=0)
         else:
             logger.error("MQTT connection rejected: %s", reason_code)
     
