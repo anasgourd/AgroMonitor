@@ -336,3 +336,65 @@ def test_get_user_alerts_invalid_id(authenticated_client):
     response = authenticated_client.get("/users/abc/alerts")
 
     assert response.status_code == 422
+
+
+
+from unittest.mock import patch
+from app.core.security import get_current_user_id
+
+
+def test_get_current_user_not_found(authenticated_client):
+    with patch("app.api.user_router.UserService") as mock_service:
+        mock_service.return_value.get_user.return_value = None
+
+        response = authenticated_client.get("/users/me")
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "User not found"
+
+
+def test_get_user_missing_record(authenticated_client):
+    with patch("app.api.user_router.UserService") as mock_service:
+        mock_service.return_value.get_user.return_value = None
+
+        response = authenticated_client.get("/users/1")
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "User not found"
+
+
+def test_update_user_missing_record(authenticated_client):
+    with patch("app.api.user_router.UserService") as mock_service:
+        mock_service.return_value.update_user.return_value = None
+
+        response = authenticated_client.put(
+            "/users/1",
+            json={
+                "username": "updateduser",
+                "full_name": "Updated User",
+                "password": "newpassword",
+            },
+        )
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "User not found"
+
+
+def test_get_user_fields_missing_record(authenticated_client):
+    with patch("app.api.user_router.UserService") as mock_service:
+        mock_service.return_value.get_user.return_value = None
+
+        response = authenticated_client.get("/users/1/fields")
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "User not found"
+
+
+def test_get_current_user_fields(authenticated_client):
+    response = authenticated_client.get("/users/me/fields")
+
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+
+    for field in response.json():
+        assert field["user_id"] == 1
