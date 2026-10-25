@@ -36,6 +36,8 @@ jobs:
       JWT_SECRET_KEY: ci-only-secret-key-not-for-production
       JWT_ALGORITHM: HS256
       JWT_EXPIRE_MINUTES: 60
+      MQTT_CONSUMER_USERNAME: ci_test_consumer
+      MQTT_CONSUMER_PASSWORD: ci_test_password
 
     steps:
       - name: Checkout repository
