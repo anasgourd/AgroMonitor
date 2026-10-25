@@ -13,6 +13,7 @@ import ssl
 logger = logging.getLogger(__name__)
 import ssl
 
+MAX_MQTT_PAYLOAD_BYTES = 4096
 
 
 class MQTTConsumer:
@@ -78,6 +79,11 @@ class MQTTConsumer:
         
         #Prometheus metric: Count total MQTT messages rejected by the broker/system
         mqtt_messages_received.inc()
+        
+        if len(message.payload) > MAX_MQTT_PAYLOAD_BYTES:
+            mqtt_messages_rejected.inc()
+            logger.warning("MQTT payload rejected: size limit exceeded")
+            return
         
         try:
             payload = message.payload.decode()

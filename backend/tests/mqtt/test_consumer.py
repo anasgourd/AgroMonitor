@@ -344,3 +344,21 @@ def test_tls_configuration(tls_enabled):
                 )
             else:
                 client.tls_set.assert_not_called()
+                
+                
+
+def test_oversized_mqtt_payload_is_rejected(caplog):
+    consumer, measurement_service = create_consumer()
+
+    # Payload larger than the 4096-byte limit.
+    message = create_message("A" * 4097)
+
+    with caplog.at_level(logging.WARNING):
+        consumer.on_message(None, None, message)
+
+    # Rejected before JSON parsing or database access.
+    measurement_service.record_measurement.assert_not_called()
+    consumer.session_factory.assert_not_called()
+
+    # Confirm the correct rejection reason was logged.
+    assert "MQTT payload rejected: size limit exceeded" in caplog.text
