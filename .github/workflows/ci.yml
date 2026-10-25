@@ -52,7 +52,7 @@ jobs:
         run: uv sync --frozen
 
       - name: Run backend tests
-        run: uv run pytest tests --cov=app --cov-report=term-missing -v
+        run: uv run python -m pytest tests --cov=app --cov-report=term-missing -v
 
   frontend-build:
     name: Frontend Build
