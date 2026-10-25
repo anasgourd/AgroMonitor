@@ -13,6 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
 from app.core.rate_limit import limiter
+import os
 
 app = FastAPI(
     title="AgroMonitor API",
@@ -21,7 +22,13 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+    origin.strip()
+        for origin in os.getenv(
+            "CORS_ORIGINS", "http://localhost:5173"
+        ).split(",")
+        if origin.strip()
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -43,3 +50,7 @@ app.include_router(measurement_router)
 app.include_router(alert_router)
 app.include_router(metrics_router)
 app.include_router(auth_router)
+
+@app.get("/health", tags=["Health"])
+def health():
+    return {"status": "ok"}

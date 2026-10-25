@@ -1,6 +1,6 @@
-import { apiFetch } from "./apiFetch";
+import { API_BASE_URL, apiFetch } from "./apiFetch";
 
-const API_BASE_URL = "http://localhost:8000";
+
 
 export async function login(username, password) {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -32,11 +32,11 @@ export async function getCurrentUser() {
 }
 
 export async function getCurrentUserFields() {
-  const response = await apiFetch("/users/me/fields");
+    const response = await apiFetch("/users/me/fields");
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch current user fields");
-  }
+    if (!response.ok) {
+        throw new Error("Failed to fetch current user fields");
+    }
 
-  return response.json();
+    return response.json();
 }
