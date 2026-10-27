@@ -4,6 +4,7 @@ from app.mqtt.consumer import MQTTConsumer
 import os
 import signal
 import threading
+from prometheus_client import start_http_server
 
 
 def main():
@@ -22,6 +23,9 @@ def main():
         port=int(os.environ.get("MQTT_CONSUMER_PORT", "1883")),
         session_factory=SessionLocal
     )
+    
+    metrics_port = int(os.getenv("METRICS_PORT", "8001"))
+    start_http_server(metrics_port, addr="0.0.0.0")
 
     try:
         consumer.start()

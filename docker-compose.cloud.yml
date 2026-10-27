@@ -20,6 +20,8 @@ services:
       MQTT_CONSUMER_TLS_ENABLED: "false"
       MQTT_CONSUMER_CA_CERT: ""
 
+      METRICS_PORT: "8001"
+
       PYTHONPATH: /app
 
     networks:
