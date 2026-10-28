@@ -2,7 +2,7 @@
 
 AgroMonitor is a full-stack IoT application for monitoring agricultural sensor data.
 
-The system collects sensor measurements through MQTT, processes and stores them in PostgreSQL, and provides a web dashboard for visualization and monitoring.
+The system provides user authentication, field and sensor management, and MQTT-based sensor data ingestion. Measurements are processed and stored in PostgreSQL, with automated anomaly detection and alert generation. A web dashboard enables users to manage their agricultural fields and sensors, visualize historical measurements, and monitor alerts.
 
 ## Features
 
