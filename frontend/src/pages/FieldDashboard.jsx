@@ -1,9 +1,3 @@
-import {
-
-  calculateAverage,
-  statusStyles,
-} from "../utils/fieldUtils";
-
 import SensorSummary from "../components/FieldDashboard/SensorSummary";
 import SensorInventory from "../components/FieldDashboard/SensorInventory";
 import HistoricalAnalysis from "../components/FieldDashboard/HistoricalAnalysis";
@@ -21,6 +15,12 @@ import {
 
 
 import { mapSensorFromApi } from "../api/sensorMapper";
+
+import {
+  calculateAverage,
+  statusStyles,
+  aggregateFieldTemperature,
+} from "../utils/fieldUtils";
 
 
 
@@ -114,13 +114,7 @@ export default function FieldDashboard({ field, onBack, onAddSensor, onEditSenso
     (sensor) => sensor.type === "Temperature"
   );
 
-  const temperatureHistory = Object.values(measurements)
-    .flat()
-    .filter((measurement) => measurement.unit === "C")
-    .map((measurement) => ({
-      value: measurement.value,
-      time: new Date(measurement.timestamp).toISOString(),
-    }));
+  const temperatureHistory = aggregateFieldTemperature(measurements);
 
   const history = {
     temperature: temperatureHistory,
@@ -199,3 +193,5 @@ export default function FieldDashboard({ field, onBack, onAddSensor, onEditSenso
     </main>
   );
 }
+
+

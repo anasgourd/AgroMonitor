@@ -41,9 +41,17 @@ export default function LineChart({ data, color, unit }) {
     const plotWidth = width - paddingLeft - paddingRight;
     const plotHeight = height - paddingTop - paddingBottom;
 
+    const timestamps = data.map((item) => new Date(item.time).getTime());
+
+    const firstTimestamp = Math.min(...timestamps);
+    const lastTimestamp = Math.max(...timestamps);
+    const timeRange = lastTimestamp - firstTimestamp;
+
     const getX = (index) =>
-        paddingLeft +
-        (index * plotWidth) / Math.max(data.length - 1, 1);
+        timeRange === 0
+            ? paddingLeft + plotWidth / 2
+            : paddingLeft +
+            ((timestamps[index] - firstTimestamp) / timeRange) * plotWidth;
 
     const getY = (value) =>
         paddingTop + ((max - value) / range) * plotHeight;
@@ -183,11 +191,13 @@ export default function LineChart({ data, color, unit }) {
                                 x={x}
                                 y={height - paddingBottom + 18}
                                 textAnchor={
-                                    index === 0
-                                        ? "start"
-                                        : index === data.length - 1
-                                            ? "end"
-                                            : "middle"
+                                    timeRange === 0
+                                        ? "middle"
+                                        : index === 0
+                                            ? "start"
+                                            : index === data.length - 1
+                                                ? "end"
+                                                : "middle"
                                 }
                                 fontSize="11"
                                 fill="#6b7280"

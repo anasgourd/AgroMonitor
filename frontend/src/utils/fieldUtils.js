@@ -29,3 +29,58 @@ export function calculateAverage(sensors) {
         activeSensors.length
     );
 }
+
+
+
+export function aggregateFieldTemperature(measurements) {
+    const buckets = new Map();
+
+    for (const [sensorId, sensorMeasurements] of Object.entries(measurements)) {
+        for (const measurement of sensorMeasurements ?? []) {
+            if (measurement.unit !== "C") continue;
+
+            const value = Number(measurement.value);
+            const timestamp = new Date(measurement.timestamp).getTime();
+
+            if (!Number.isFinite(value) || !Number.isFinite(timestamp)) {
+                continue;
+            }
+
+            // Group readings into one-minute UTC buckets.
+            const minute = Math.floor(timestamp / 60000) * 60000;
+
+            if (!buckets.has(minute)) {
+                buckets.set(minute, new Map());
+            }
+
+            const sensorBucket = buckets.get(minute);
+            const current = sensorBucket.get(sensorId) ?? {
+                sum: 0,
+                count: 0,
+            };
+
+            current.sum += value;
+            current.count += 1;
+
+            sensorBucket.set(sensorId, current);
+        }
+    }
+
+    return [...buckets.entries()]
+        .sort(([timeA], [timeB]) => timeA - timeB)
+        .map(([minute, sensors]) => {
+            const sensorAverages = [...sensors.values()].map(
+                ({ sum, count }) => sum / count
+            );
+
+            const average =
+                sensorAverages.reduce((sum, value) => sum + value, 0) /
+                sensorAverages.length;
+
+            return {
+                time: new Date(minute).toISOString(),
+                value: average,
+            };
+        });
+}
+
