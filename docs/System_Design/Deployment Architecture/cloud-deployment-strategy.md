@@ -1,129 +1,200 @@
 # AgroMonitor — Cloud Deployment Strategy
 
-**Status:** Planned
+**Status:** Implemented — Software V1
 
 ## 1. Overview
 
-AgroMonitor V1 currently runs in a local Docker Compose environment, consisting of a React frontend, FastAPI backend, PostgreSQL database, Eclipse Mosquitto broker, and a dedicated MQTT consumer.
+AgroMonitor V1 uses a hybrid cloud and local deployment architecture.
 
-The next phase focuses on deploying the application to the cloud and enabling connectivity with remote IoT sensors.
+The React frontend and FastAPI backend are hosted on Render, while Neon PostgreSQL provides managed cloud database storage.
 
-The selected approach is **Render for application hosting and EMQX Cloud for managed MQTT messaging**.
+The MQTT infrastructure remains local, using Eclipse Mosquitto and dedicated MQTT consumers running in Docker containers. A separate cloud consumer connects to Neon PostgreSQL to persist incoming sensor measurements.
 
-The goal is to establish an accessible, maintainable deployment while minimizing infrastructure management overhead and preserving the existing application architecture.
+This approach provides a publicly accessible web application while preserving the existing Docker-based MQTT infrastructure.
+
+The deployment strategy prioritizes simplicity, low infrastructure overhead, and reuse of the existing application architecture.
 
 ## 2. Deployment Architecture
 
-| Component | Current Implementation | Planned Cloud Deployment |
+| Component | Deployment | Technology |
 |---|---|---|
-| Frontend | React/Vite in Docker | Render Static Site |
-| Backend | FastAPI Docker container | Render Web Service |
-| Database | PostgreSQL Docker container | Managed PostgreSQL |
-| MQTT Broker | Self-hosted Eclipse Mosquitto | EMQX Cloud |
-| MQTT Consumer | Dedicated Docker container | Render Background Worker or equivalent |
-| MQTT Clients | Paho-MQTT | Paho-MQTT with TLS |
+| Frontend | Render Static Site | React / Vite |
+| Backend | Render Web Service | FastAPI |
+| Database | Neon Cloud | PostgreSQL |
+| MQTT Broker | Local Docker | Eclipse Mosquitto |
+| MQTT Consumer | Local Docker | Python / Paho-MQTT |
+| Cloud MQTT Consumer | Local Docker | Python / Paho-MQTT + Neon |
+| Monitoring | Local Docker | Prometheus / Grafana |
+| CI/CD | GitHub Actions + Render | Automated testing and deployment |
 
-The existing Docker Compose environment will remain available for local development and integration testing.
+The existing local development environment remains available through Docker Compose.
+
+### Data Flow
+
+```text
+Simulated Sensor Publisher
+           |
+           | MQTT
+           v
+    Eclipse Mosquitto
+       (Local Docker)
+           |
+           v
+    MQTT Cloud Consumer
+       (Local Docker)
+           |
+           v
+     Neon PostgreSQL
+           |
+           v
+      FastAPI Backend
+          (Render)
+           |
+           v
+      React Frontend
+          (Render)
+```
+
+The cloud consumer validates incoming measurements, applies threshold-based anomaly detection, and stores measurements and generated alerts in Neon PostgreSQL.
+
+The FastAPI backend exposes the stored data through authenticated REST endpoints, which are consumed by the React frontend.
 
 ## 3. Why Render?
 
-Render was selected as a managed application hosting platform for the following reasons:
+Render was selected as the application hosting platform for the following reasons:
 
-- **Simplified Deployment:** Supports Docker-based applications and deployment directly from Git repositories.
-- **Reduced Operational Overhead:** Eliminates the need to manually configure and maintain a Linux server.
-- **Managed Services:** Provides application hosting, environment variable management, and managed PostgreSQL.
-- **Existing Docker Compatibility:** Allows reuse of the current backend Dockerfile and containerized application structure.
-- **Development Focus:** Enables faster progress toward physical sensor integration and ML engineering.
+- **Simplified Deployment:** Supports deployment directly from Git repositories.
+- **Reduced Operational Overhead:** Eliminates the need to maintain a dedicated application server.
+- **Environment Management:** Supports production configuration through environment variables.
+- **Docker Compatibility:** Allows reuse of the existing backend container configuration.
+- **Development Focus:** Enables faster progress without introducing unnecessary infrastructure complexity.
 
-## 4. Why EMQX Cloud?
+The frontend is deployed as a Render Static Site, while the backend runs as a Render Web Service.
 
-EMQX Cloud was selected as the planned managed MQTT broker.
+## 4. Why Neon PostgreSQL?
 
-- **Remote Connectivity:** Enables physical IoT sensors to communicate with the deployed system.
-- **Secure Communication:** Supports MQTT over TLS, authentication, and access control.
-- **Managed Infrastructure:** Reduces the need to maintain and secure a publicly accessible MQTT broker.
-- **Scalability:** Provides infrastructure options for future increases in sensor connectivity and message volume.
-- **Protocol Compatibility:** Allows continued use of the existing Paho-MQTT publisher and consumer implementations.
+Neon was selected as the managed PostgreSQL provider for cloud persistence.
 
-The migration from Mosquitto to EMQX Cloud is primarily motivated by deployment convenience, remote connectivity, and reduced operational overhead, rather than performance limitations of Mosquitto.
+- **PostgreSQL Compatibility:** Preserves the existing SQLAlchemy models, repositories, and database interactions.
+- **Managed Infrastructure:** Eliminates the need to operate a dedicated cloud database server.
+- **Cloud Accessibility:** Allows both the deployed FastAPI backend and the local cloud consumer to access the same database.
+- **Minimal Application Changes:** Requires primarily database connection configuration rather than changes to the application architecture.
 
-## 5. Alternative Considered — Docker Compose on a VPS
+The local PostgreSQL container remains available for development and testing.
 
-An alternative approach would be to deploy the existing Docker Compose stack on a cloud virtual private server (VPS).
+## 5. MQTT Deployment Decision
 
-This would allow the application to retain its current container architecture, including the self-hosted Mosquitto broker and PostgreSQL database.
+The initial deployment plan considered migrating the MQTT broker to EMQX Cloud and hosting the MQTT consumer as a cloud background worker.
 
-**Advantages:**
-- Greater control over infrastructure and networking.
-- Direct reuse of the existing Docker Compose setup.
-- Practical experience with Linux administration, reverse proxies, firewalls, and production container management.
+However, the implemented Software V1 retains Eclipse Mosquitto and the MQTT consumers in the local Docker environment.
 
-**Trade-offs:**
-- Additional server configuration and maintenance.
-- Responsibility for TLS, security updates, backups, monitoring, and availability.
-- More time spent on infrastructure operations rather than application development.
+### Reasons for This Decision
 
-**Decision:** Render + EMQX Cloud is preferred for the current project phase because it reduces deployment complexity and allows development to progress more quickly toward ML and CPS integration.
+- The existing Mosquitto infrastructure was already implemented and tested.
+- MQTT authentication and topic-level ACLs were configured.
+- The local consumer architecture was functioning reliably during integration testing.
+- A separate cloud consumer could write measurements directly to Neon PostgreSQL.
+- Managed MQTT hosting was not necessary to demonstrate the complete simulated sensor workflow.
+- Keeping MQTT local reduced deployment complexity and additional infrastructure requirements.
 
-A VPS deployment remains a possible future option for additional DevOps experience or different infrastructure requirements.
+### Deployment Limitation
 
-## 6. Expected Changes
+The frontend and backend remain hosted on Render independently of the local Docker environment.
 
-The cloud migration primarily affects infrastructure and service configuration rather than application logic.
+However, new MQTT measurements are ingested only while the local broker, cloud consumer, and a publisher are running.
 
-**Components that remain unchanged:**
-- MQTT topic structure and JSON measurement payload.
-- Paho-MQTT client library.
-- Measurement validation and anomaly detection logic.
-- Measurement and alert persistence workflow.
-- Core publisher–broker–consumer architecture.
-- Existing Docker-based local development environment.
+This architecture does not provide continuously available cloud MQTT ingestion.
 
-**Required changes:**
-- Configure cloud application services and database connectivity.
-- Replace local Mosquitto connection settings with EMQX Cloud endpoints.
-- Configure MQTT authentication and TLS.
-- Manage production secrets and environment variables.
-- Adapt frontend configuration for production hosting.
-- Configure service health checks and deployment-specific operational settings.
+A managed MQTT broker such as EMQX Cloud remains a possible future option if remote connectivity or continuous ingestion becomes necessary.
 
-## 7. Future Integration
+## 6. Docker Configuration
 
-After cloud deployment, AgroMonitor will integrate an **ESP32 with a physical sensor**, replacing or complementing the simulated Python publisher.
+Docker Compose is used to organize the local application infrastructure.
 
-The final end-to-end workflow will be:
+The deployment configuration is separated into three files:
 
-```text
-ESP32 + Physical Sensor
-          |
-          | MQTT over TLS
-          v
-      EMQX Cloud
-          |
-          v
- MQTT Consumer (Cloud)
-          |
-          v
-   MeasurementService
-          |
-          v
-  Managed PostgreSQL
-          |
-          v
-     FastAPI Backend
-          |
-          v
-    React Dashboard
-```
+| File | Purpose |
+|---|---|
+| `docker-compose.yml` | Local application stack |
+| `docker-compose.cloud.yml` | MQTT cloud consumer connected to Neon |
+| `docker-compose.monitoring.yml` | Prometheus and Grafana monitoring |
 
-End-to-end testing will verify the complete flow from physical sensor measurements to database persistence, anomaly detection, alerts, and frontend visualization.
+This separation allows the cloud ingestion and monitoring components to be managed independently of the main application stack.
 
-## 8. Conclusion
+The local Docker environment is also retained for development and integration testing.
 
-The planned migration to **Render + EMQX Cloud** provides a practical path from local development to a cloud-accessible IoT application.
+## 7. CI/CD
 
-The approach preserves the existing software architecture, reuses containerization work, and reduces infrastructure maintenance responsibilities.
+GitHub Actions automates validation and deployment.
 
-This allows the project to prioritize physical sensor integration, end-to-end validation, and future ML engineering capabilities.
+The workflow is triggered by pushes to the `futuristic-ui` branch and pull requests targeting the configured branches.
 
-The final deployment configuration will be validated against service availability, pricing, and operational requirements before implementation.
+### Continuous Integration
+
+- Backend automated tests using pytest
+- Dedicated PostgreSQL test database
+- Backend test coverage reporting
+- Frontend dependency installation
+- Frontend production build validation
+
+### Continuous Deployment
+
+After successful backend tests and frontend build validation, GitHub Actions triggers Render deployment hooks for:
+
+- FastAPI Backend
+- React Frontend
+
+Deployment is triggered only for pushes to the `futuristic-ui` branch.
+
+This ensures that automated deployment is initiated only after the CI jobs succeed.
+
+## 8. Monitoring
+
+Observability is implemented using Python logging, Prometheus, and Grafana.
+
+The local MQTT consumer exposes an HTTP metrics endpoint on port `8001`.
+
+Prometheus collects metrics every 15 seconds, and Grafana provides dashboards for monitoring MQTT ingestion and measurement processing.
+
+Monitored metrics include:
+
+- MQTT messages received
+- MQTT messages rejected
+- Measurements stored
+- Anomalies detected
+- Alerts created
+- MQTT throughput
+- Message rejection rate
+
+Prometheus and Grafana remain local and are intended for administrator monitoring.
+
+The production FastAPI application does not expose a public `/metrics` endpoint.
+
+## 9. Future Physical Sensor Integration
+
+The next integration stage will introduce an ESP32 microcontroller and a physical sensor.
+
+The ESP32 will connect through Wi-Fi and publish measurements using MQTT.
+
+The existing broker, consumer, database, API, and frontend architecture can be reused for local-network sensor integration.
+
+Network accessibility, MQTT credentials, and payload compatibility will be configured and validated during hardware integration.
+
+A managed cloud MQTT broker may be considered separately if sensors need to communicate from outside the local network.
+
+## 10. Conclusion
+
+AgroMonitor Software V1 has been deployed using a hybrid architecture combining Render, Neon PostgreSQL, and local Docker-based MQTT infrastructure.
+
+The deployment provides:
+
+- A hosted frontend and backend
+- Managed PostgreSQL persistence
+- MQTT-based simulated sensor ingestion
+- Automated testing and deployment
+- Local observability through Prometheus and Grafana
+- Continued support for Docker-based development
+
+The selected architecture meets the Software V1 objectives without introducing unnecessary infrastructure complexity.
+
+Continuous cloud MQTT ingestion and managed MQTT hosting remain outside the current deployment scope.

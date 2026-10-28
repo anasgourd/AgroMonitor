@@ -1,22 +1,29 @@
 # AgroMonitor
 
-Smart agriculture monitoring application.
+AgroMonitor is a full-stack IoT application for monitoring agricultural sensor data.
 
-## Tech Stack
+The system collects sensor measurements through MQTT, processes and stores them in PostgreSQL, and provides a web dashboard for visualization and monitoring.
 
-- React
-- Vite
-- Tailwind CSS
+## Features
 
-## Current Status
+- User authentication and authorization
+- Field and sensor management
+- MQTT-based sensor data ingestion
+- Historical measurement visualization
+- Anomaly detection and automated alerts
+- RESTful API for data access and management
+- Cloud deployment
+- Automated testing and CI/CD
+- Logging and monitoring
 
-Initial UI implementation.
+## Demo
 
-## Planned
+The application is deployed on Render with a Neon PostgreSQL database.
 
-- Field dashboard
-- Sensor monitoring
-- Field visualization
-- Alerts
-- Analytics
-- Backend integration
+**Live Demo:** [https://agromonitor-frontend.onrender.com/]
+
+*Sensor data ingestion currently runs through a local MQTT infrastructure.*
+
+## Documentation
+
+Detailed technical documentation, including system architecture, design decisions, implementation, testing, and deployment, is available in the [`docs/`](docs/) directory.
