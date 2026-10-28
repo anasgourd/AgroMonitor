@@ -1,22 +1,29 @@
-**Technical Debt: Seen Alerts Local Storage Cleanup**
+# Technical Debt — Post V1
 
-- **Current behavior:** Seen alert IDs αποθηκεύονται στο browser `localStorage` και παραμένουν εκεί, ώστε τα επιβεβαιωμένα alerts να μην εμφανίζονται ξανά μετά από refresh.
-- **Limitation:** Τα IDs συσσωρεύονται καθώς δημιουργούνται και επιβεβαιώνονται νέα alerts.
-- **Impact:** Μικρό για το V1, καθώς τα IDs καταλαμβάνουν ελάχιστο χώρο.
-- **Future improvement:** Καθαρισμός των Seen IDs όταν τα αντίστοιχα alerts διαγράφονται από το backend, ώστε να διατηρούνται μόνο οι απαραίτητες εγγραφές.
-- **Scope:** Frontend improvement, χωρίς απαραίτητη αλλαγή στο backend API.
-- **Priority:** Low — να αντιμετωπιστεί όταν χρειαστεί βελτίωση της διαχείρισης των alerts.
+**Status:** Deferred  
+**Priority:** Low
 
-### [ ] Improve Backend Test Coverage Before V1 Release
+### 1. [ ] Backend-Based Alert Acknowledgment
 
-**Current status:** All tests passing, 93% backend coverage.
+- **Current behavior:** Seen alert IDs are stored in the browser's `localStorage`.
+- **Limitation:** Acknowledgment state is browser-specific, does not synchronize across devices, and stored IDs accumulate over time.
+- **Future improvement:** Move alert acknowledgment state to the backend and persist it in PostgreSQL.
+- **Implementation:** Introduce an acknowledgment field (e.g. `is_acknowledged`) in the Alert model and provide an authenticated API endpoint to update it.
+- **Benefit:** Persistent, centralized alert management across browsers and devices.
+- **Scope:** Backend, database, and frontend.
 
-Before the V1 release, review uncovered error-handling and edge-case branches and add tests where they provide meaningful coverage.
+### 2. [ ] User Registration (Sign Up Page)
 
-- [ ] **Security:** Test invalid, expired and malformed JWTs, including missing required claims.
-- [ ] **API routers:** Cover remaining error paths, such as `404 Not Found`, authentication failures and ownership violations.
-- [ ] **Repositories:** Test missing resources and failure cases (e.g. returning `False` when a field does not exist).
-- [ ] **Services:** Test business-rule violations, including inactive sensors, missing sensors and future measurement timestamps.
-- [ ] **Final verification:** Run the complete test suite with coverage, review failures and regressions, and confirm the final coverage report before release.
+- **Current behavior:** Users can log in, but there is no dedicated frontend registration page.
+- **Future improvement:** Implement a Sign Up page using the existing backend registration endpoint.
+- **Scope:** Primarily frontend.
 
-**Priority:** Before V1 release  
+### 3. [ ] Dependency Updates
+
+- **Future improvement:** Review and update outdated Python and JavaScript dependencies, prioritizing security-related updates.
+- **Validation:** Run backend tests, frontend tests, and production build after updates.
+- **Scope:** Backend and frontend.
+
+---
+
+**Decision:** These improvements are deferred and do not block the Software V1 release.
