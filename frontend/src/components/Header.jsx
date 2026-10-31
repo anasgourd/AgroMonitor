@@ -32,21 +32,13 @@ export default function Header({ onLogout, onHome }) {
 
       {/* User and Logout */}
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-emerald-600 text-white rounded-full flex items-center justify-center font-bold shadow-md shadow-emerald-100">
-            A
-          </div>
-
-          <div className="hidden sm:flex flex-col">
-            <strong className="text-sm font-semibold text-gray-800">
-              Anastasis
-            </strong>
-
-            <span className="text-xs text-gray-500">
-              Field Manager
-            </span>
-          </div>
+        <div className="hidden sm:flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span className="text-sm font-semibold text-emerald-700">
+            System Online
+          </span>
         </div>
+
 
         <button
           onClick={onLogout}
@@ -59,6 +51,6 @@ export default function Header({ onLogout, onHome }) {
           </span>
         </button>
       </div>
-    </header>
+    </header >
   );
 }
