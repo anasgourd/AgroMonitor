@@ -61,16 +61,15 @@ export default function LineChart({ data, color, unit }) {
         .join(" ");
 
     // Show at most 6 evenly distributed time labels.
-    const labelCount = Math.min(6, data.length);
-    const labelIndexes = Array.from(
-        { length: labelCount },
-        (_, index) =>
-            labelCount === 1
-                ? 0
-                : Math.round(
-                    (index * (data.length - 1)) / (labelCount - 1)
-                )
-    );
+    // Four evenly spaced labels across the actual time range.
+    const timeTicks =
+        timeRange === 0
+            ? [firstTimestamp]
+            : Array.from(
+                { length: 4 },
+                (_, index) =>
+                    firstTimestamp + (index * timeRange) / 3
+            );
 
     const formatTime = (time) => {
         const date = new Date(time);
@@ -181,9 +180,14 @@ export default function LineChart({ data, color, unit }) {
                         />
                     ))}
 
+
                     {/* X-axis date/time labels */}
-                    {labelIndexes.map((index) => {
-                        const x = getX(index);
+                    {timeTicks.map((timestamp, index) => {
+                        const x =
+                            timeRange === 0
+                                ? paddingLeft + plotWidth / 2
+                                : paddingLeft +
+                                ((timestamp - firstTimestamp) / timeRange) * plotWidth;
 
                         return (
                             <text
@@ -195,17 +199,18 @@ export default function LineChart({ data, color, unit }) {
                                         ? "middle"
                                         : index === 0
                                             ? "start"
-                                            : index === data.length - 1
+                                            : index === timeTicks.length - 1
                                                 ? "end"
                                                 : "middle"
                                 }
                                 fontSize="11"
                                 fill="#6b7280"
                             >
-                                {formatTime(data[index].time)}
+                                {formatTime(timestamp)}
                             </text>
                         );
                     })}
+
                 </svg>
             </div>
 
