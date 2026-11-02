@@ -1,6 +1,23 @@
+import { useEffect, useRef, useState } from "react";
+
 export default function LineChart({ data, color, unit }) {
-    const width = 700;
+
+    const containerRef = useRef(null);
+    const [width, setWidth] = useState(700);
     const height = 280;
+
+    useEffect(() => {
+        const element = containerRef.current;
+        if (!element) return;
+
+        const observer = new ResizeObserver(([entry]) => {
+            setWidth(entry.contentRect.width);
+        });
+
+        observer.observe(element);
+
+        return () => observer.disconnect();
+    }, []);
 
     const paddingLeft = 55;
     const paddingRight = 20;
@@ -106,9 +123,11 @@ export default function LineChart({ data, color, unit }) {
 
             <div className="rounded-2xl bg-white/70 border border-gray-200 p-3 overflow-hidden">
                 <svg
+                    ref={containerRef}
                     viewBox={`0 0 ${width} ${height}`}
-                    className="w-full h-80"
-                    preserveAspectRatio="none"
+                    className="w-full"
+                    style={{ height: `${height}px` }}
+                    preserveAspectRatio="xMidYMid meet"
                     role="img"
                     aria-label={`${unit} historical trend chart`}
                 >
