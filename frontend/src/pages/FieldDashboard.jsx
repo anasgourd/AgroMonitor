@@ -175,7 +175,12 @@ export default function FieldDashboard({ field, onBack, onAddSensor, onEditSenso
 
         <section className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-8">
 
-          <FieldMap area={field.area} />
+          <FieldMap
+            area={field.area}
+            fieldName={field.name}
+            sensors={sensors}
+            measurements={Object.values(measurements).flat()}
+          />
 
           <FieldOverview
             fieldId={field.id}
