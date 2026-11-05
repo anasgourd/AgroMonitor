@@ -12,6 +12,7 @@ import { mapFieldFromApi } from "./api/fieldMapper";
 import Login from "./pages/Login";
 import {
   login,
+  register,
   getCurrentUser,
   getCurrentUserFields,
 } from "./api/auth";
@@ -19,6 +20,8 @@ import {
 import AddSensor from "./pages/AddSensor";
 import EditSensor from "./pages/EditSensor";
 import DeleteSensor from "./pages/DeleteSensor";
+
+
 
 export default function App() {
 
@@ -155,6 +158,16 @@ export default function App() {
     }
   }
 
+  async function handleRegister(fullName, username, password) {
+    try {
+      await register(fullName, username, password);
+      return true;
+    } catch (error) {
+      console.error("Registration failed:", error);
+      return false;
+    }
+  }
+
 
   function handleEditSensor(sensor) {
     setFieldForSensorEdit(selectedField);
@@ -228,7 +241,12 @@ export default function App() {
   }
 
   if (!isLoggedIn) {
-    return <Login onLogin={handleLogin} />;
+    return (
+      <Login
+        onLogin={handleLogin}
+        onRegister={handleRegister}
+      />
+    );
   }
   return (
 

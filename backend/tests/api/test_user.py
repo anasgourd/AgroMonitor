@@ -398,3 +398,68 @@ def test_get_current_user_fields(authenticated_client):
 
     for field in response.json():
         assert field["user_id"] == 1
+        
+        
+
+from app.models.user import User
+from app.core.security import verify_password
+
+
+def test_register_duplicate_username(client):
+    payload = {
+        "username": "duplicate_signup_user",
+        "full_name": "Duplicate User",
+        "password": "testpassword",
+    }
+
+    first_response = client.post("/users/", json=payload)
+    assert first_response.status_code == 201
+
+    second_response = client.post("/users/", json=payload)
+
+    assert second_response.status_code == 409
+    assert second_response.json()["detail"] == "Username already exists"
+
+
+def test_register_password_hashing(client, db_session):
+    password = "my_secure_password"
+
+    response = client.post(
+        "/users/",
+        json={
+            "username": "signup_hash_user",
+            "full_name": "Hash Test User",
+            "password": password,
+        },
+    )
+
+    assert response.status_code == 201
+
+    user = (
+        db_session.query(User)
+        .filter(User.username == "signup_hash_user")
+        .first()
+    )
+
+    assert user is not None
+    assert user.password != password
+    assert verify_password(password, user.password)
+
+
+def test_register_response_no_password(client):
+    response = client.post(
+        "/users/",
+        json={
+            "username": "signup_response_user",
+            "full_name": "Response Test User",
+            "password": "testpassword",
+        },
+    )
+
+    assert response.status_code == 201
+
+    data = response.json()
+
+    assert "password" not in data
+    assert "access_token" not in data
+    assert data["username"] == "signup_response_user"
