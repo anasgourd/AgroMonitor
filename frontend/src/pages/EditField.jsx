@@ -6,7 +6,7 @@ export default function EditField({ field, onBack, onUpdated }) {
     const [type, setType] = useState(field.type);
 
     // Convert the formatted area value back to a number for the input.
-    const [area, setArea] = useState(parseFloat(field.area));
+    const [area, setArea] = useState(Number.parseFloat(field.area));
 
     async function handleSubmit(event) {
         event.preventDefault();
@@ -55,11 +55,12 @@ export default function EditField({ field, onBack, onUpdated }) {
 
                         {/* Field name */}
                         <div>
-                            <label className="block text-sm font-medium text-emerald-950 mb-2">
+                            <label htmlFor="edit-field-name" className="block text-sm font-medium text-emerald-950 mb-2">
                                 Field name
                             </label>
 
                             <input
+                                id="edit-field-name"
                                 type="text"
                                 value={fieldName}
                                 onChange={(event) => setFieldName(event.target.value)}
@@ -72,11 +73,12 @@ export default function EditField({ field, onBack, onUpdated }) {
 
                         {/* Type */}
                         <div>
-                            <label className="block text-sm font-medium text-emerald-950 mb-2">
+                            <label htmlFor="edit-field-type" className="block text-sm font-medium text-emerald-950 mb-2">
                                 Field type
                             </label>
 
                             <input
+                                id="edit-field-type"
                                 type="text"
                                 value={type}
                                 onChange={(event) => setType(event.target.value)}
@@ -89,12 +91,13 @@ export default function EditField({ field, onBack, onUpdated }) {
 
                         {/* Area */}
                         <div>
-                            <label className="block text-sm font-medium text-emerald-950 mb-2">
+                            <label htmlFor="edit-field-area" className="block text-sm font-medium text-emerald-950 mb-2">
                                 Area
                             </label>
 
                             <div className="relative">
                                 <input
+                                    id="edit-field-area"
                                     type="number"
                                     value={area}
                                     onChange={(event) => setArea(event.target.value)}

@@ -79,7 +79,7 @@ export default function FieldDashboard({ field, onBack, onAddSensor, onEditSenso
       }
     }
 
-    loadFieldData();
+    void loadFieldData();
 
     const intervalId = setInterval(loadFieldData, 15000);
 

@@ -20,7 +20,7 @@ export default function AddFieldForm({ onCancel, onCreated }) {
             onCreated(newField);
         } catch (error) {
             console.error("Failed to create field:", error);
-        }κ
+        }
     }
 
     return (
@@ -28,11 +28,12 @@ export default function AddFieldForm({ onCancel, onCreated }) {
 
             {/* Field name */}
             <div>
-                <label className="block text-sm font-medium text-emerald-950 mb-2">
+                <label htmlFor="add-field-name" className="block text-sm font-medium text-emerald-950 mb-2">
                     Field name
                 </label>
 
                 <input
+                    id="add-field-name"
                     type="text"
                     value={fieldName}
                     onChange={(event) => setFieldName(event.target.value)}
@@ -46,11 +47,12 @@ export default function AddFieldForm({ onCancel, onCreated }) {
 
             {/* Type */}
             <div>
-                <label className="block text-sm font-medium text-emerald-950 mb-2">
+                <label htmlFor="add-field-type" className="block text-sm font-medium text-emerald-950 mb-2">
                     Field type
                 </label>
 
                 <input
+                    id="add-field-type"
                     type="text"
                     value={type}
                     onChange={(event) => setType(event.target.value)}
@@ -64,12 +66,13 @@ export default function AddFieldForm({ onCancel, onCreated }) {
 
             {/* Area */}
             <div>
-                <label className="block text-sm font-medium text-emerald-950 mb-2">
+                <label htmlFor="add-field-area" className="block text-sm font-medium text-emerald-950 mb-2">
                     Area
                 </label>
 
                 <div className="relative">
                     <input
+                        id="add-field-area"
                         type="number"
                         value={area}
                         onChange={(event) => setArea(event.target.value)}

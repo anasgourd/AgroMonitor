@@ -30,11 +30,12 @@ export default function AddSensorForm({
 
             {/* Sensor name */}
             <div>
-                <label className="block text-sm font-medium text-emerald-950 mb-2">
+                <label htmlFor="add-sensor-name" className="block text-sm font-medium text-emerald-950 mb-2">
                     Sensor name
                 </label>
 
                 <input
+                    id="add-sensor-name"
                     type="text"
                     value={sensorName}
                     onChange={(event) => setSensorName(event.target.value)}
@@ -48,11 +49,12 @@ export default function AddSensorForm({
 
             {/* Status */}
             <div>
-                <label className="block text-sm font-medium text-emerald-950 mb-2">
+                <label htmlFor="add-sensor-status" className="block text-sm font-medium text-emerald-950 mb-2">
                     Status
                 </label>
 
                 <select
+                    id="add-sensor-status"
                     value={status}
                     onChange={(event) => setStatus(event.target.value)}
                     className="w-full border border-emerald-200 rounded-xl px-4 py-3

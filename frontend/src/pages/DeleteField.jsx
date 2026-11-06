@@ -39,11 +39,15 @@ export default function DeleteField({
     return (
         <div
             className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 px-4"
-            onClick={onCancel}
         >
+            <button
+                type="button"
+                aria-label="Close delete field confirmation"
+                className="absolute inset-0 w-full h-full cursor-default"
+                onClick={onCancel}
+            />
             <div
-                className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm"
-                onClick={(event) => event.stopPropagation()}
+                className="relative bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm"
             >
                 <h2 className="text-lg font-semibold text-gray-900">
                     Delete field?

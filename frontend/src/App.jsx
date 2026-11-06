@@ -197,7 +197,11 @@ export default function App() {
       }
     }
 
-    checkAuthentication();
+    checkAuthentication().catch((error) => {
+      console.error("Unexpected authentication error:", error);
+      setIsLoggedIn(false);
+      setIsCheckingAuth(false);
+    });
   }, []);
 
 
