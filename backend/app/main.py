@@ -52,5 +52,5 @@ app.include_router(metrics_router)
 app.include_router(auth_router)
 
 @app.get("/health", tags=["Health"])
-def health():
+async def health():
     return {"status": "ok"}
