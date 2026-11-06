@@ -362,3 +362,68 @@ def test_oversized_mqtt_payload_is_rejected(caplog):
 
     # Confirm the correct rejection reason was logged.
     assert "MQTT payload rejected: size limit exceeded" in caplog.text
+
+def test_malformed_payload_does_not_block_other_sensor():
+    consumer, measurement_service = create_consumer()
+
+    # Sensor 1 sends malformed telemetry.
+    invalid_message = create_message(
+        '{"sensor_id": 1, "value": INVALID}'
+    )
+
+    # Sensor 2 sends valid telemetry.
+    valid_message = create_message(json.dumps({
+        "sensor_id": 2,
+        "value": 25.0,
+        "timestamp": "2026-09-22T20:00:00Z",
+        "unit": "C",
+    }))
+
+    consumer.on_message(None, None, invalid_message)
+    consumer.on_message(None, None, valid_message)
+
+    # Only the valid measurement should reach the service.
+    measurement_service.record_measurement.assert_called_once()
+
+    measurement = (
+        measurement_service.record_measurement.call_args.args[0]
+    )
+
+    assert measurement.sensor_id == 2
+    assert measurement.value == 25.0
+
+def test_sensor_database_failure_does_not_block_other_sensor():
+    consumer, measurement_service = create_consumer()
+
+    processed_sensors = []
+
+    def process_measurement(measurement):
+        if measurement.sensor_id == 1:
+            raise SQLAlchemyError("Simulated database failure")
+
+        processed_sensors.append(measurement.sensor_id)
+
+    measurement_service.record_measurement.side_effect = (
+        process_measurement
+    )
+
+    def sensor_message(sensor_id):
+        return create_message(json.dumps({
+            "sensor_id": sensor_id,
+            "value": 25.0,
+            "timestamp": "2026-09-22T20:00:00Z",
+            "unit": "C",
+        }))
+
+    # Sensor 1 fails.
+    consumer.on_message(None, None, sensor_message(1))
+
+    # Sensor 2 should continue processing.
+    consumer.on_message(None, None, sensor_message(2))
+
+    assert measurement_service.record_measurement.call_count == 2
+    assert processed_sensors == [2]
+
+    # Database sessions must be closed after both messages.
+    db = consumer.session_factory.return_value
+    assert db.close.call_count == 2
