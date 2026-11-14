@@ -7,6 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Frontend
 node_modules
 dist
 dist-ssr
@@ -22,3 +23,29 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# SonarQube
+.scannerwork/
+
+# Test coverage
+.coverage
+.coverage.*
+coverage/
+htmlcov/
+
+# Python / Backend
+backend/.venv/
+backend/__pycache__/
+backend/**/*.pyc
+
+# Environment variables
+.env
+backend/.env
+
+# Python test cache
+.pytest_cache/agromonitor_backup*.sql
+/agromonitor_backup.sql
+
+
+
+/mqtt/config/passwd

@@ -1,12 +1,29 @@
-# React + Vite
+# AgroMonitor
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+AgroMonitor is a full-stack IoT application for monitoring agricultural sensor data.
 
-Currently, two official plugins are available:
+The system provides user authentication, field and sensor management, and MQTT-based sensor data ingestion. Measurements are processed and stored in PostgreSQL, with automated anomaly detection and alert generation. A web dashboard enables users to manage their agricultural fields and sensors, visualize historical measurements, and monitor alerts.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- User authentication and authorization
+- Field and sensor management
+- MQTT-based sensor data ingestion
+- Historical measurement visualization
+- Anomaly detection and automated alerts
+- RESTful API for data access and management
+- Cloud deployment
+- Automated testing and CI/CD
+- Logging and monitoring
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Demo
+
+The application is deployed on Render with a Neon PostgreSQL database.
+
+**Live Demo:** [https://agromonitor-frontend.onrender.com/]
+
+*Sensor data ingestion currently runs through a local MQTT infrastructure.*
+
+## Documentation
+
+Detailed technical documentation, including system architecture, design decisions, implementation, testing, and deployment, is available in the [`docs/`](docs/) directory.

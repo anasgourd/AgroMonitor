@@ -1,0 +1,96 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: agromonitor
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:${POSTGRES_PASSWORD}@postgres:5432/agromonitor
+      MQTT_BROKER: mqtt
+      MQTT_PORT: 1883
+      MQTT_CONSUMER_HOST: mqtt
+      MQTT_CONSUMER_PORT: "1883"
+
+      MQTT_CONSUMER_USERNAME: ${MQTT_CONSUMER_USERNAME}
+      MQTT_CONSUMER_PASSWORD: ${MQTT_CONSUMER_PASSWORD}
+
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_ALGORITHM: ${JWT_ALGORITHM}
+      JWT_EXPIRE_MINUTES: ${JWT_EXPIRE_MINUTES}
+
+      MQTT_CONSUMER_TLS_ENABLED: ${MQTT_CONSUMER_TLS_ENABLED:-false}
+      MQTT_CONSUMER_CA_CERT: ${MQTT_CONSUMER_CA_CERT:-}
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      - postgres
+      - mqtt
+
+  mqtt:
+    image: eclipse-mosquitto:2
+    ports:
+      - "127.0.0.1:1883:1883"
+    volumes:
+      - ./mqtt/config:/mosquitto/config:ro
+    restart: unless-stopped
+
+  consumer:
+    build:
+      context: ./backend
+    command: [ "uv", "run", "python", "scripts/run_mqtt_consumer.py" ]
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:${POSTGRES_PASSWORD}@postgres:5432/agromonitor
+      MQTT_BROKER: mqtt
+      MQTT_PORT: 1883
+      MQTT_CONSUMER_HOST: mqtt
+      MQTT_CONSUMER_PORT: "1883"
+      MQTT_CONSUMER_USERNAME: ${MQTT_CONSUMER_USERNAME}
+      MQTT_CONSUMER_PASSWORD: ${MQTT_CONSUMER_PASSWORD}
+
+      MQTT_CONSUMER_TLS_ENABLED: ${MQTT_CONSUMER_TLS_ENABLED:-false}
+      MQTT_CONSUMER_CA_CERT: ${MQTT_CONSUMER_CA_CERT:-}
+
+      PYTHONPATH: /app
+    depends_on:
+      - postgres
+      - mqtt
+
+  frontend:
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "127.0.0.1:5173:5173"
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    depends_on:
+      - backend
+
+  publisher:
+    profiles: [ "tools" ]
+    build:
+      context: ./backend
+    command: [ "uv", "run", "python", "-m", "scripts.publish_measurement" ]
+    environment:
+      MQTT_BROKER: mqtt
+      MQTT_PORT: 1883
+      MQTT_PUBLISHER_USERNAME: ${MQTT_PUBLISHER_USERNAME}
+      MQTT_PUBLISHER_PASSWORD: ${MQTT_PUBLISHER_PASSWORD}
+      PYTHONPATH: /app
+    depends_on:
+      - mqtt
+
+volumes:
+  postgres_data:

@@ -1,0 +1,33 @@
+services:
+  cloud-consumer:
+    build:
+      context: ./backend
+
+    command: [ "uv", "run", "python", "scripts/run_mqtt_consumer.py" ]
+
+    environment:
+      DATABASE_URL: ${NEON_DATABASE_URL:?NEON_DATABASE_URL is required}
+
+      MQTT_BROKER: mqtt
+      MQTT_PORT: "1883"
+      MQTT_CONSUMER_HOST: mqtt
+      MQTT_CONSUMER_PORT: "1883"
+      MQTT_CONSUMER_TOPIC: agromonitor/cloud/sensors
+
+      MQTT_CONSUMER_USERNAME: ${MQTT_CONSUMER_USERNAME}
+      MQTT_CONSUMER_PASSWORD: ${MQTT_CONSUMER_PASSWORD}
+
+      MQTT_CONSUMER_TLS_ENABLED: "false"
+      MQTT_CONSUMER_CA_CERT: ""
+
+      METRICS_PORT: "8001"
+
+      PYTHONPATH: /app
+
+    networks:
+      - agromonitor_local
+
+networks:
+  agromonitor_local:
+    external: true
+    name: agromonitor_default
